@@ -1,43 +1,68 @@
 import api from "./axios";
 
-/* -------- Generic API handler -------- */
+/* ---------------- GET GROUPS ---------------- */
 
-const handleRequest = async(request, defaultMessage) => {
+export const getGroups = async() => {
     try {
-        const { data } = await request();
-        return data;
+
+        const res = await api.get("/api/group");
+        return res.data;
+
     } catch (error) {
-        let message = defaultMessage;
 
-        const responseData = error ? .response ? .data;
+        let message = "Failed to fetch groups";
 
-        if (responseData) {
-            if (typeof responseData === "object" && responseData.message) {
-                message = responseData.message;
-            } else if (typeof responseData === "string") {
-                message = responseData;
+        if (error && error.response && error.response.data) {
+
+            const data = error.response.data;
+
+            if (typeof data === "object" && data.message) {
+                message = data.message;
+            } else if (typeof data === "string") {
+                message = data;
             }
-        } else if (error ? .message) {
+
+        } else if (error && error.message) {
+
             message = error.message;
         }
 
-        console.error(defaultMessage + ":", message);
+        console.error("Failed to fetch groups:", message);
+
         throw new Error(message);
     }
 };
 
-/* ---------------- GET GROUPS ---------------- */
-
-export const getGroups = () =>
-    handleRequest(
-        () => api.get("/api/group"),
-        "Failed to fetch groups"
-    );
 
 /* ---------------- CREATE GROUP ---------------- */
 
-export const createGroup = (data) =>
-    handleRequest(
-        () => api.post("/api/group", data),
-        "Failed to create group"
-    );
+export const createGroup = async(data) => {
+    try {
+
+        const res = await api.post("/api/group", data);
+        return res.data;
+
+    } catch (error) {
+
+        let message = "Failed to create group";
+
+        if (error && error.response && error.response.data) {
+
+            const data = error.response.data;
+
+            if (typeof data === "object" && data.message) {
+                message = data.message;
+            } else if (typeof data === "string") {
+                message = data;
+            }
+
+        } else if (error && error.message) {
+
+            message = error.message;
+        }
+
+        console.error("Failed to create group:", message);
+
+        throw new Error(message);
+    }
+};

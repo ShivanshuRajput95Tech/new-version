@@ -1,25 +1,21 @@
-import axios from "axios";
-import { baseUrl } from "../apiConfig";
+import axios from "axios"
+import { baseUrl } from "../apiConfig"
 
 const api = axios.create({
     baseURL: baseUrl,
-    withCredentials: true,
-});
+    withCredentials: true
+})
 
-api.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem("token");
+api.interceptors.request.use((config) => {
 
-        if (token) {
-            config.headers = {
-                ...config.headers,
-                Authorization: `Bearer ${token}`,
-            };
-        }
+    const token = localStorage.getItem("token")
 
-        return config;
-    },
-    (error) => Promise.reject(error)
-);
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+    }
 
-export default api;
+    return config
+
+})
+
+export default api

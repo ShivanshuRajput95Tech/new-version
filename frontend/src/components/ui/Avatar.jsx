@@ -1,4 +1,4 @@
-import { memo } from "react"
+import { memo, useMemo } from "react"
 
 const sizeClasses = {
   xs: "w-6 h-6 text-xs",
@@ -17,65 +17,34 @@ const colors = [
   "bg-orange-600"
 ]
 
-function getInitials(name) {
-  if (!name) return "?"
+const Avatar = memo(({ name = "", size = "md", bgColor, textColor = "text-white", className = "" }) => {
 
-  const parts = name.trim().split(" ")
-  if (parts.length === 1) return parts[0][0].toUpperCase()
+  const safeName = typeof name === "string" ? name.trim() : ""
 
-  return (parts[0][0] + parts[1][0]).toUpperCase()
-}
+  const initial = safeName ? safeName.charAt(0).toUpperCase() : "?"
 
-function getColor(name) {
-  let hash = 0
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash)
-  }
+  const sizeClass = sizeClasses[size] || sizeClasses.md
 
-  return colors[Math.abs(hash) % colors.length]
-}
+  const color = useMemo(() => {
+    if (bgColor) return bgColor
 
-const Avatar = memo(
-  ({
-    name = "",
-    src,
-    size = "md",
-    bgColor,
-    textColor = "text-white",
-    className = ""
-  }) => {
+    const index = safeName.length % colors.length
+    return colors[index]
+  }, [safeName, bgColor])
 
-    const safeName = typeof name === "string" ? name.trim() : ""
+  return (
 
-    const initials = getInitials(safeName)
+    <div
+      role="img"
+      aria-label={safeName || "User avatar"}
+      title={safeName || "User"}
+      className={`${sizeClass} ${color} ${textColor} ${className} rounded-full flex items-center justify-center font-semibold select-none transition-all duration-200`}
+    >
+      {initial}
+    </div>
 
-    const sizeClass = sizeClasses[size] || sizeClasses.md
-
-    const color = bgColor || getColor(safeName)
-
-    if (src) {
-      return (
-        <img
-          src={src}
-          alt={safeName || "User avatar"}
-          title={safeName || "User"}
-          className={`${sizeClass} ${className} rounded-full object-cover`}
-        />
-      )
-    }
-
-    return (
-      <div
-        role="img"
-        aria-label={safeName || "User avatar"}
-        title={safeName || "User"}
-        className={`${sizeClass} ${color} ${textColor} ${className} rounded-full flex items-center justify-center font-semibold select-none`}
-      >
-        {initials}
-      </div>
-    )
-  }
-)
+  )
+})
 
 Avatar.displayName = "Avatar"
 

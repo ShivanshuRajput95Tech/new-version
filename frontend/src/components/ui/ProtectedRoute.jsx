@@ -1,43 +1,40 @@
 import { Navigate, useLocation } from "react-router-dom"
 import { useAuthStore } from "../../store/authStore"
 
-function AuthLoading() {
-  return (
-    <div className="flex items-center justify-center min-h-screen text-gray-400">
-      <div className="animate-pulse">
-        Checking authentication...
-      </div>
-    </div>
-  )
-}
+export default function ProtectedRoute({ children }) {
 
-export default function ProtectedRoute({
-  children,
-  requiredRole
-}) {
-
-  const user = useAuthStore((s) => s.user)
-  const loading = useAuthStore((s) => s.loading)
+  const { user, loading } = useAuthStore((state) => ({
+    user: state.user,
+    loading: state.loading
+  }))
 
   const location = useLocation()
 
+  /* Wait until auth check finishes */
+
   if (loading) {
-    return <AuthLoading />
+    return (
+      <div className="flex items-center justify-center min-h-screen text-gray-400">
+        <div className="animate-pulse">
+          Checking authentication...
+        </div>
+      </div>
+    )
   }
+
+  /* Not authenticated */
 
   if (!user) {
     return (
       <Navigate
         to="/login"
         replace
-        state={{ from: location }}
+        state={{ from: location.pathname }}
       />
     )
   }
 
-  if (requiredRole && user.role !== requiredRole) {
-    return <Navigate to="/unauthorized" replace />
-  }
+  /* Authenticated */
 
-  return children
+  return children ? children : null
 }

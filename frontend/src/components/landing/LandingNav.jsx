@@ -1,83 +1,49 @@
+import React from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { memo } from "react";
 
-const navLinks = [
-  { label: "Developer", path: "/developer" },
-  { label: "Design Studio", path: "/design" },
-  { label: "Test Chat", path: "/test" },
-  { label: "Contact", path: "#" }
-];
-
-function LandingNav() {
+const LandingNav = () => {
   const { isAuthenticated } = useAuth();
 
   return (
-    <nav>
-      <div className="max-w-screen-xl flex items-center justify-between mx-auto p-4">
-
-        {/* Logo */}
-
-        <Link to="/" className="flex items-center space-x-3">
-          <img
-            src="https://flowbite.com/docs/images/logo.svg"
-            className="h-8"
-            alt="Swift Chat Logo"
-          />
-          <span className="text-2xl font-semibold text-white whitespace-nowrap">
-            Swift-Chat
-          </span>
-        </Link>
-
-        {/* Mobile Menu Button */}
-
+    <nav className="">
+      <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+        <a className="flex items-center space-x-3 rtl:space-x-reverse">
+          <img src="https://flowbite.com/docs/images/logo.svg" className="h-8" alt="Swift Logo" />
+          <span className="self-center text-2xl font-semibold whitespace-nowrap text-white">Swift-Chat</span>
+        </a>
         <button
+          data-collapse-toggle="navbar-default"
           type="button"
-          className="inline-flex items-center justify-center w-10 h-10 text-gray-400 rounded-lg md:hidden hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600"
+          className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+          aria-controls="navbar-default"
+          aria-expanded="false"
         >
           <span className="sr-only">Open main menu</span>
-
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            viewBox="0 0 17 14"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M1 1h15M1 7h15M1 13h15"
-            />
+          <svg className="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
+            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1 1h15M1 7h15M1 13h15" />
           </svg>
         </button>
-
-        {/* Desktop Navigation */}
-
-        <div className="hidden md:flex gap-3">
-
-          <Link
-            to={isAuthenticated ? "/chathome" : "/login"}
-            className="py-1 px-2 text-white hover:text-slate-300 transition"
-          >
+        <div className="hidden w-full md:flex md:w-auto gap-3" id="navbar-default">
+          <Link to={isAuthenticated ? "/chathome" : "/login"} className="block py-1 px-2 text-white hover:text-[#1f2937]">
             {isAuthenticated ? "Home" : "Login"}
           </Link>
-
-          {navLinks.map((link) => (
-            <Link
-              key={link.label}
-              to={link.path}
-              className="py-1 px-2 text-white hover:text-slate-300 transition"
-            >
-              {link.label}
-            </Link>
-          ))}
-
+          <Link to="/developer" className="block py-1 px-2 text-white hover:text-[#1f2937]">
+            Developer
+          </Link>
+          <Link to="/design" className="block py-1 px-2 text-white hover:text-[#1f2937]">
+            Design Studio
+          </Link>
+          <Link to="/test" className="block py-1 px-2 text-white hover:text-[#1f2937]">
+            Test Chat
+          </Link>
+          <Link to="#" className="block py-1 px-2 text-white hover:text-[#1f2937]">
+            Contact
+          </Link>
         </div>
-
       </div>
     </nav>
   );
-}
+};
 
-export default memo(LandingNav);
+export default LandingNav;

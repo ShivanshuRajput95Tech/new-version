@@ -5,34 +5,43 @@ import { useAuthStore } from "../store/authStore"
 export const useChat = () => {
 
     const user = useAuthStore((s) => s.user)
-    const userId = user ? ._id || null
+    const userId = user?._id || null
 
-    const messages = useChatStore((s) => s.messages)
-    const selectedUser = useChatStore((s) => s.selectedUser)
-    const selectedGroup = useChatStore((s) => s.selectedGroup)
-    const onlineUsers = useChatStore((s) => s.onlineUsers)
-    const groups = useChatStore((s) => s.groups)
-    const storeSendMessage = useChatStore((s) => s.sendMessage)
+    const {
+        messages,
+        selectedUser,
+        selectedGroup,
+        onlineUsers,
+        groups,
+        sendMessage: storeSendMessage
+    } = useChatStore((state) => ({
+        messages: state.messages,
+        selectedUser: state.selectedUser,
+        selectedGroup: state.selectedGroup,
+        onlineUsers: state.onlineUsers,
+        groups: state.groups,
+        sendMessage: state.sendMessage
+    }))
 
-    /* Send message */
+    /* Send message wrapper */
 
     const sendMessage = useCallback((text) => {
 
-        const message = text ? .trim()
+        const message = text?.trim()
 
         if (!message || !userId) return
-        if (!selectedUser && !selectedGroup) return
 
         storeSendMessage({
             text: message,
             senderId: userId,
-            receiverId: selectedUser || null,
-            groupId: selectedGroup || null
+            receiverId: selectedUser,
+            groupId: selectedGroup
         })
 
     }, [storeSendMessage, userId, selectedUser, selectedGroup])
 
-    /* Ownership check */
+
+    /* Check message ownership */
 
     const isOwnMessage = useCallback((message) => {
 

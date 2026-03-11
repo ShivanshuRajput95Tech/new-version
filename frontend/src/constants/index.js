@@ -1,36 +1,19 @@
-/* =========================
-   Environment
-========================= */
+/* Environment */
 
-const ENV =
-    import.meta.env
+const API_URL = (
+    import.meta.env.VITE_API_URL || "").trim()
+const SOCKET_URL_ENV = (
+    import.meta.env.VITE_SOCKET_URL || "").trim()
 
 const DEFAULT_LOCAL_URL = "http://localhost:4000"
 
-/* =========================
-   API / Socket URLs
-========================= */
+/* Base URLs */
 
-export const API_BASE_URL =
-    ENV.VITE_API_URL ? .trim() || DEFAULT_LOCAL_URL
-
-export const SOCKET_URL =
-    ENV.VITE_SOCKET_URL ? .trim() || API_BASE_URL
+export const API_BASE_URL = API_URL || DEFAULT_LOCAL_URL
+export const SOCKET_URL = SOCKET_URL_ENV || DEFAULT_LOCAL_URL
 
 
-/* =========================
-   App Info
-========================= */
-
-export const APP = Object.freeze({
-    NAME: "SwiftChat",
-    VERSION: "1.0.0"
-})
-
-
-/* =========================
-   UI Colors
-========================= */
+/* UI Colors */
 
 export const COLORS = Object.freeze({
     primary: "bg-indigo-600",
@@ -47,21 +30,16 @@ export const COLORS = Object.freeze({
 })
 
 
-/* =========================
-   Message Types
-========================= */
+/* Message Types */
 
 export const MESSAGE_TYPES = Object.freeze({
     TEXT: "text",
     IMAGE: "image",
-    FILE: "file",
-    SYSTEM: "system"
+    FILE: "file"
 })
 
 
-/* =========================
-   Chat Types
-========================= */
+/* Chat Types */
 
 export const CHAT_TYPES = Object.freeze({
     DIRECT: "direct",
@@ -69,50 +47,17 @@ export const CHAT_TYPES = Object.freeze({
 })
 
 
-/* =========================
-   Socket Events
-========================= */
-
-export const SOCKET_EVENTS = Object.freeze({
-    CONNECT: "connect",
-    DISCONNECT: "disconnect",
-
-    SEND_MESSAGE: "sendMessage",
-    RECEIVE_MESSAGE: "receiveMessage",
-
-    USER_TYPING: "userTyping",
-    USER_STOP_TYPING: "userStopTyping",
-
-    ONLINE_USERS: "onlineUsers"
-})
-
-
-/* =========================
-   Local Storage Keys
-========================= */
+/* Local Storage Keys */
 
 export const STORAGE_KEYS = Object.freeze({
-    USER: "swiftchat_user",
-    TOKEN: "swiftchat_token",
-    THEME: "swiftchat_theme"
+    USER: "user",
+    TOKEN: "token"
 })
 
 
-/* =========================
-   Pagination
-========================= */
+/* Pagination */
 
 export const PAGINATION = Object.freeze({
     MESSAGES_PER_PAGE: 20,
     USERS_PER_PAGE: 50
-})
-
-
-/* =========================
-   Timing Config
-========================= */
-
-export const TIMERS = Object.freeze({
-    TYPING_INDICATOR_MS: 3000,
-    RECONNECT_DELAY_MS: 2000
 })

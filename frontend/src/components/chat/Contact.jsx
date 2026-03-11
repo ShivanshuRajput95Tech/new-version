@@ -1,40 +1,33 @@
-import { memo, useCallback } from "react";
+import React from "react";
 import Avatar from "./Avatar";
 
 const Contact = ({
   userId,
-  username = "User",
+  username,
   selectedUserId,
   setSelectedUserId,
-  isOnline = false,
-  avatarLink
+  isOnline,
+  avatarLink,
 }) => {
-
-  const isSelected = selectedUserId === userId;
-
-  const handleSelect = useCallback(() => {
-    setSelectedUserId?.(userId);
-  }, [userId, setSelectedUserId]);
-
   return (
     <li
-      onClick={handleSelect}
-      className={`flex items-center gap-3 px-3 lg:px-5 py-2 lg:py-3 rounded-[1.3rem] capitalize cursor-pointer transition-colors
-        ${isSelected ? "bg-blue-600" : "hover:bg-slate-700"}`}
+      key={userId}
+      className={`${
+        selectedUserId === userId ? "bg-blue-600" : ""
+      } capitalize py-2 lg:py-3 px-2 lg:px-5 rounded-[1.3rem] cursor-pointer`}
+      onClick={() => {
+        setSelectedUserId(userId);
+      }}
     >
       <Avatar
         userId={userId}
         username={username}
-        avatarLink={avatarLink}
         isOnline={isOnline}
+        avatarLink={avatarLink}
       />
-
-      <span className="flex-1 text-xs lg:text-base truncate">
-        {username}
-      </span>
-
+      <span className="text-xs lg:text-base text-center">{username}</span>
       {isOnline && (
-        <span className="text-[10px] lg:text-xs bg-green-500 px-2 py-0.5 rounded-full">
+        <span className="text-xs rounded-full bg-green-500 px-2 py-1">
           Active
         </span>
       )}
@@ -42,4 +35,4 @@ const Contact = ({
   );
 };
 
-export default memo(Contact);
+export default Contact;

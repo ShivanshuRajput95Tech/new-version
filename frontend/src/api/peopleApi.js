@@ -1,27 +1,24 @@
 import api from "./axios";
 
-/* -------- Generic request handler -------- */
+/* ---------------- GET PEOPLE ---------------- */
 
-const handleRequest = async(request, defaultMessage) => {
+export const getPeople = async() => {
     try {
-        const { data } = await request();
-        return data;
+        const res = await api.get("/api/user/people");
+        return res.data;
     } catch (error) {
-        const message =
-            error ? .response ? .data ? .message ||
-            (typeof error ? .response ? .data === "string" && error.response.data) ||
-            error ? .message ||
-            defaultMessage;
-
-        console.error(`${defaultMessage}:`, message);
+        let message = "Failed to fetch people";
+        if (error && error.response && error.response.data) {
+            const data = error.response.data;
+            if (typeof data === "object" && data.message) {
+                message = data.message;
+            } else if (typeof data === "string") {
+                message = data;
+            }
+        } else if (error && error.message) {
+            message = error.message;
+        }
+        console.error("Failed to fetch people:", message);
         throw new Error(message);
     }
 };
-
-/* ---------------- GET PEOPLE ---------------- */
-
-export const getPeople = () =>
-    handleRequest(
-        () => api.get("/api/user/people"),
-        "Failed to fetch people"
-    );

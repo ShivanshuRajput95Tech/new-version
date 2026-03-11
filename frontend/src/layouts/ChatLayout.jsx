@@ -28,16 +28,22 @@ export default function ChatLayout({ sidebar, main }) {
     update()
 
     mobileQuery.addEventListener?.("change", update)
+    mobileQuery.addListener?.(update)
+
     tabletQuery.addEventListener?.("change", update)
+    tabletQuery.addListener?.(update)
 
     return () => {
       mobileQuery.removeEventListener?.("change", update)
+      mobileQuery.removeListener?.(update)
+
       tabletQuery.removeEventListener?.("change", update)
+      tabletQuery.removeListener?.(update)
     }
 
   }, [])
 
-  /* Close sidebar when chat selected on mobile */
+  /* Close sidebar on mobile when chat selected */
 
   useEffect(() => {
     if (isMobile && (selectedUser || selectedGroup)) {
@@ -52,14 +58,18 @@ export default function ChatLayout({ sidebar, main }) {
     [onlineUsers]
   )
 
-  /* Group map */
+  /* Group map for faster lookup */
 
   const groupMap = useMemo(() => {
+
     const map = new Map()
+
     for (const g of groups || []) {
       map.set(g._id, g)
     }
+
     return map
+
   }, [groups])
 
   /* Chat header info */
@@ -108,8 +118,13 @@ export default function ChatLayout({ sidebar, main }) {
   return (
 
     <div className="h-screen w-full flex bg-slate-950 text-gray-200 overflow-hidden relative">
-
-      {/* Sidebar Overlay */}
+      {/* Animated Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(59,130,246,0.08),transparent_50%)] animate-pulse"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(147,51,234,0.06),transparent_50%)] animate-pulse delay-1000"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_40%,rgba(16,185,129,0.05),transparent_50%)] animate-pulse delay-2000"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_60%_90%,rgba(245,158,11,0.04),transparent_50%)] animate-pulse delay-3000"></div>
+      </div>
 
       {sidebarOpen && isMobile && (
         <div
@@ -136,11 +151,7 @@ export default function ChatLayout({ sidebar, main }) {
         {sidebar}
       </div>
 
-      {/* Main Area */}
-
-      <div className="flex flex-col flex-1 relative z-10">
-
-        {/* Header */}
+      {/* Main Area */} relative z-10">
 
         <div
           className={`
@@ -148,11 +159,16 @@ export default function ChatLayout({ sidebar, main }) {
             flex items-center gap-4
             ${isMobile ? "h-14 px-4" : "h-16 px-6"}
             backdrop-blur-xl
+            shadow-lg00/50
+            flex items-center gap-4
+            ${isMobile ? "h-14 px-4" : "h-16 px-6"}
           `}
         >
-
-          <button
-            aria-label="Toggle chat list"
+/80 hover:bg-slate-700/80 transition-all duration-200 hover:scale-105 active:scale-95 backdrop-blur-sm"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>ria-label="Toggle chat list"
             onClick={() => setSidebarOpen((s) => !s)}
             className="md:hidden p-2 rounded-lg bg-slate-800 hover:bg-slate-700"
           >
@@ -167,7 +183,7 @@ export default function ChatLayout({ sidebar, main }) {
 
               {chatInfo.isOnline && (
                 <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-slate-900 rounded-full" />
-              )}
+              )} text-white
 
             </div>
 
@@ -191,8 +207,6 @@ export default function ChatLayout({ sidebar, main }) {
 
         </div>
 
-        {/* Chat Content */}
-
         <div className="flex-1 overflow-hidden relative">
           {main}
         </div>
@@ -206,5 +220,6 @@ export default function ChatLayout({ sidebar, main }) {
       </div>
 
     </div>
+
   )
 }

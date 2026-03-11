@@ -16,21 +16,19 @@ export default function UserList() {
   const [search, setSearch] = useState("")
   const [loading, setLoading] = useState(true)
 
-  /* Load users */
-
   useEffect(() => {
 
     const loadUsers = async () => {
       try {
-
         const users = await getPeople()
 
-        setAllUsers(
-          users.filter(u => u._id !== currentUser?._id)
-        )
+        // remove current user from list
+        const filtered = users.filter(u => u._id !== currentUser?._id)
 
-      } catch (err) {
-        console.error("Failed to load users:", err)
+        setAllUsers(filtered)
+
+      } catch (error) {
+        console.error("Failed to load users:", error)
       } finally {
         setLoading(false)
       }
@@ -40,28 +38,20 @@ export default function UserList() {
 
   }, [currentUser])
 
-  /* Online user lookup */
-
-  const onlineSet = useMemo(() => {
-    return new Set(onlineUsers.map(u => u.userId))
-  }, [onlineUsers])
-
-  /* Search */
+  const searchTerm = search.toLowerCase()
 
   const filteredUsers = useMemo(() => {
-
-    const term = search.toLowerCase()
 
     return allUsers.filter((user) => {
 
       const name =
         `${user.firstName || ""} ${user.lastName || ""}`.toLowerCase()
 
-      return name.includes(term)
+      return name.includes(searchTerm)
 
     })
 
-  }, [allUsers, search])
+  }, [allUsers, searchTerm])
 
   const noResults = !loading && filteredUsers.length === 0
 
@@ -105,9 +95,11 @@ export default function UserList() {
 
         {!loading && filteredUsers.map((user) => {
 
-          const isOnline = onlineSet.has(user._id)
+          const isOnline = onlineUsers.some(
+            (online) => online.userId === user._id
+          )
+
           const isSelected = selectedUser === user._id
-          const name = `${user.firstName} ${user.lastName}`
 
           return (
 
@@ -122,15 +114,15 @@ export default function UserList() {
             >
 
               <Avatar
-                username={name}
-                userId={user._id}
+                name={`${user.firstName} ${user.lastName}`}
+                size="sm"
                 className={isOnline ? "ring-2 ring-green-500" : ""}
               />
 
               <div className="flex-1 min-w-0">
 
                 <div className="font-medium truncate">
-                  {name}
+                  {user.firstName} {user.lastName}
                 </div>
 
                 <div className="text-xs text-gray-400">

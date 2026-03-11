@@ -1,55 +1,51 @@
-import { memo, useEffect, useRef, useMemo } from "react"
+import { memo, useEffect, useRef } from "react"
 import Message from "./Message"
 
 const VirtualizedMessageList = memo(({ messages = [], onReaction, user }) => {
 
-  const bottomRef = useRef(null)
+    const bottomRef = useRef(null)
 
-  const userId = user?._id
+    /* Auto scroll to latest message */
 
-  /* Normalize messages */
+    useEffect(() => {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" })
+    }, [messages.length])
 
-  const normalizedMessages = useMemo(() => {
-    return messages.map((msg) => {
-      const senderId = msg?.senderId || msg?.sender?._id
-      return {
-        ...msg,
-        isOwn: senderId === userId
-      }
-    })
-  }, [messages, userId])
+    if (!messages.length) {
+        return (
+            <div className="flex flex-1 items-center justify-center text-gray-400 text-sm">
+                No messages yet
+            </div>
+        )
+    }
 
-  /* Auto-scroll */
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [normalizedMessages.length])
-
-  if (!normalizedMessages.length) {
     return (
-      <div className="flex flex-1 items-center justify-center text-gray-400 text-sm">
-        No messages yet
-      </div>
+
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-slate-800">
+
+            {messages.map((message, index) => {
+
+                const senderId =
+                    message?.senderId || message?.sender?._id
+
+                const isOwn = senderId === user?._id
+
+                return (
+                    <Message
+                        key={message._id || index}
+                        message={message}
+                        isOwn={isOwn}
+                        onReaction={onReaction}
+                        user={user}
+                    />
+                )
+            })}
+
+            <div ref={bottomRef} />
+
+        </div>
     )
-  }
 
-  return (
-    <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-slate-800">
-
-      {normalizedMessages.map((message) => (
-        <Message
-          key={message._id || message.id}
-          message={message}
-          isOwn={message.isOwn}
-          onReaction={onReaction}
-          user={user}
-        />
-      ))}
-
-      <div ref={bottomRef} />
-
-    </div>
-  )
 })
 
 VirtualizedMessageList.displayName = "VirtualizedMessageList"

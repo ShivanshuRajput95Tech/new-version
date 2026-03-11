@@ -4,23 +4,25 @@ import api from "./axios";
 
 const handleRequest = async(request) => {
     try {
-        const { data } = await request();
-        return data;
+        const res = await request();
+        return res.data;
     } catch (error) {
         const message =
-            error ? .response ? .data ? .message ||
-            error ? .message ||
+            (error && error.response && error.response.data && error.response.data.message) ||
+            (error && error.message) ||
             "API request failed";
 
         console.error("API Error:", message);
-        throw new Error(message);
+        throw message;
     }
 };
 
-/* ---------------- AUTH ---------------- */
+/* ---------------- LOGIN ---------------- */
 
 export const loginUser = (data) =>
     handleRequest(() => api.post("/api/user/login", data));
+
+/* ---------------- REGISTER ---------------- */
 
 export const registerUser = (data) =>
     handleRequest(() => api.post("/api/user/register", data));

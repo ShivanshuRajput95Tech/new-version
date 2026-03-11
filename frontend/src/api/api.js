@@ -2,56 +2,67 @@ import { API_BASE_URL } from "../constants";
 
 const API_URL = `${API_BASE_URL}/api`;
 
-const request = async(endpoint, options = {}) => {
-    const res = await fetch(`${API_URL}${endpoint}`, {
+export const registerUser = async(data) => {
+
+    const res = await fetch(`${API_URL}/auth/register`, {
+        method: "POST",
         headers: {
-            "Content-Type": "application/json",
-            ...options.headers
+            "Content-Type": "application/json"
         },
-        ...options
+        body: JSON.stringify(data)
     });
 
     return res.json();
-};
 
-export const registerUser = async(data) => {
-    return request("/auth/register", {
-        method: "POST",
-        body: JSON.stringify(data)
-    });
 };
 
 export const loginUser = async(data) => {
-    return request("/auth/login", {
+
+    const res = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
         credentials: "include",
         body: JSON.stringify(data)
     });
-};
 
+    return res.json();
+
+};
 export const getUnreadCounts = async() => {
-    return request("/messages/unread/counts", {
+
+    const res = await fetch(`${API_URL}/messages/unread/counts`, {
         method: "GET",
+        headers: {
+            "Content-Type": "application/json"
+        },
         credentials: "include"
     });
-};
 
+    return res.json();
+
+};
 export const uploadImage = async(file) => {
+
     try {
-        const formData = new FormData();
-        formData.append("file", file);
+
+        const formData = new FormData()
+        formData.append("file", file)
 
         const res = await fetch(`${API_URL}/upload/image`, {
             method: "POST",
             body: formData
-        });
+        })
 
         if (!res.ok) {
-            throw new Error("Upload failed");
+            throw new Error("Upload failed")
         }
 
-        return res.json();
+        return await res.json()
+
     } catch (err) {
-        console.error("Upload error:", err);
+        console.error("Upload error:", err)
     }
+
 };

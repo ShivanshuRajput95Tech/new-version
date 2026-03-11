@@ -1,32 +1,40 @@
 import api from "./axios";
 
-/* -------- Generic request handler -------- */
-
-const handleRequest = async(request, defaultMessage) => {
-    try {
-        const { data } = await request();
-        return data;
-    } catch (error) {
-        const message =
-            error ? .response ? .data ? .message ||
-            (typeof error ? .response ? .data === "string" && error.response.data) ||
-            error ? .message ||
-            defaultMessage;
-
-        console.error(defaultMessage + ":", message);
-        throw new Error(message);
-    }
-};
-
 /* ---------------- GET MESSAGES ---------------- */
 
 export const getMessages = async(userId) => {
+
     if (!userId) {
         throw new Error("User ID is required to fetch messages");
     }
 
-    return handleRequest(
-        () => api.get(`/api/user/messages/${userId}`),
-        "Failed to fetch messages"
-    );
+    try {
+
+        const res = await api.get(`/api/user/messages/${userId}`);
+
+        return res.data;
+
+    } catch (error) {
+
+        let message = "Failed to fetch messages";
+
+        if (error && error.response && error.response.data) {
+
+            const data = error.response.data;
+
+            if (typeof data === "object" && data.message) {
+                message = data.message;
+            } else if (typeof data === "string") {
+                message = data;
+            }
+
+        } else if (error && error.message) {
+
+            message = error.message;
+        }
+
+        console.error("Failed to fetch messages:", message);
+
+        throw new Error(message);
+    }
 };
