@@ -9,10 +9,11 @@ import { Toaster } from "react-hot-toast";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import axios from "axios";
 import { ProfileProvider } from "./context/ProfileContext";
-import { useEffect, lazy, Suspense, createContext, useContext, useState } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import { baseUrl } from "../apiConfig";
 import LoadingPage from "./components/LoadingPage";
 import { useLoading } from "./hooks/useLoading";
+import { GlobalLoadingContext } from "./context/GlobalLoadingContext";
 
 axios.defaults.baseURL = baseUrl;
 axios.defaults.withCredentials = true;
@@ -28,17 +29,6 @@ const Design = lazy(() => import("./pages/Design"));
 const TestChat = lazy(() => import("./pages/TestChat"));
 const LoadingDemo = lazy(() => import("./pages/LoadingDemo"));
 const Chat = lazy(() => import("./pages/Chat"));
-
-// Loading Context
-const LoadingContext = createContext();
-
-export const useGlobalLoading = () => {
-    const context = useContext(LoadingContext);
-    if (!context) {
-        throw new Error('useGlobalLoading must be used within a LoadingProvider');
-    }
-    return context;
-};
 
 const Layout = () => {
     const { checkAuth } = useAuth();
@@ -110,7 +100,7 @@ function App() {
     const loadingState = useLoading();
 
     return (
-        <LoadingContext.Provider value={loadingState}>
+        <GlobalLoadingContext.Provider value={loadingState}>
             <AuthProvider>
                 <ProfileProvider>
                     <Suspense fallback={
@@ -135,7 +125,7 @@ function App() {
                     )}
                 </ProfileProvider>
             </AuthProvider>
-        </LoadingContext.Provider>
+        </GlobalLoadingContext.Provider>
     );
 }
 

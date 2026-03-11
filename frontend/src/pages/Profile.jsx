@@ -5,7 +5,7 @@ import Nav from "../components/chat/Nav";
 import { useAuth } from "../context/AuthContext";
 import SelectAvatar from "../components/SelectAvatar";
 import { User, Mail, Save, Sparkles, Heart, Star } from "lucide-react";
-import { useGlobalLoading } from "../App";
+import { useGlobalLoading } from "../context/GlobalLoadingContext";
 
 const Profile = () => {
   const { user } = useAuth();

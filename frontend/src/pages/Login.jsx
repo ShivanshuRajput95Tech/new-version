@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { Mail, Lock, ArrowRight } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
-import { useGlobalLoading } from "../App";
+import { useGlobalLoading } from "../context/GlobalLoadingContext";
 
 const Login = () => {
   const [data, setData] = useState({ email: "", password: "" });

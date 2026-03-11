@@ -4,7 +4,6 @@ let socketUrl;
 
 // Determine environment
 const isProd = import.meta.env.MODE === 'production';
-const isDev = import.meta.env.MODE === 'development';
 
 if (isProd) {
     // Production URLs from environment variables
