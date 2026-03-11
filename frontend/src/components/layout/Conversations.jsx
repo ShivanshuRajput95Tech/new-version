@@ -78,6 +78,20 @@ export default function Conversations({ onToggle, users = [], selectedUserId, on
         </div>
       </div>
 
+      <div className="px-5 pt-3 pb-2 border-b border-slate-100">
+        <ul className="grid grid-cols-3 gap-2">
+          <li className="text-center">
+            <button className="w-full py-2 rounded-xl border border-indigo-200 text-indigo-600 bg-indigo-50 text-sm font-medium">new chat</button>
+          </li>
+          <li className="text-center">
+            <button className="w-full py-2 rounded-xl border border-emerald-200 text-emerald-600 bg-emerald-50 text-sm font-medium">new call</button>
+          </li>
+          <li className="text-center">
+            <button className="w-full py-2 rounded-xl border border-rose-200 text-rose-600 bg-rose-50 text-sm font-medium">new contact</button>
+          </li>
+        </ul>
+      </div>
+
       <div className="px-5 py-3 border-b border-slate-100">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold text-slate-800">Message ({mode === "chat" ? filteredUsers.length : 0})</h3>
