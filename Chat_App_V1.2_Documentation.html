@@ -1,0 +1,1965 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat App V1.2 - Code Documentation</title>
+  <style>
+    * { margin: 0; padding: 0; }
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: white;
+      padding: 40px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    h1 { font-size: 2.5em; margin: 30px 0 20px 0; color: #1a73e8; border-bottom: 3px solid #1a73e8; padding-bottom: 10px; }
+    h2 { font-size: 2em; margin: 25px 0 15px 0; color: #1e40af; }
+    h3 { font-size: 1.3em; margin: 20px 0 10px 0; color: #3b82f6; }
+    p { margin: 10px 0; }
+    code { background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-family: 'Courier New', monospace; color: #d32f2f; }
+    pre { background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 5px; overflow-x: auto; margin: 15px 0; line-height: 1.4; }
+    pre code { background: none; padding: 0; color: inherit; }
+    li { margin-left: 30px; margin: 5px 0 5px 30px; }
+    a { color: #1a73e8; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    strong { color: #1a73e8; font-weight: 600; }
+    em { font-style: italic; }
+    hr { border: none; border-top: 2px solid #ddd; margin: 40px 0; }
+    .header-section { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; border-radius: 8px; text-align: center; margin-bottom: 40px; }
+    .header-section h1 { color: white; border: none; margin: 0; font-size: 3em; }
+    .header-section p { color: rgba(255,255,255,0.9); margin: 10px 0 0 0; font-size: 1.1em; }
+    .toc { background: #f9f9f9; padding: 20px; border-left: 4px solid #1a73e8; margin: 20px 0; }
+    .toc ul { list-style: none; }
+    .toc li { margin: 5px 0; padding-left: 20px; }
+    .toc li:before { content: "→ "; color: #1a73e8; font-weight: bold; }
+    .section-break { page-break-after: always; margin: 50px 0; }
+    @media print { body { padding: 0; } .section-break { page-break-after: always; } }
+  </style>
+</head>
+<body>
+  <div class="header-section">
+    <h1>Chat App V1.2</h1>
+    <p>Complete Code Documentation</p>
+    <p style="font-size: 0.9em; margin-top: 10px;">Generated on March 10, 2026</p>
+  </div>
+  
+  <h1>Chat App V1.2 - Complete Code Documentation</h1><strong>Generated:</strong> March 10, 2026  
+<strong>Project:</strong> Chat Application - Full Stack (Node.js + React)  
+<strong>Repository:</strong> Chat_appV1.2<p>---</p><h2>Table of Contents</h2>
+1. <a href="#project-overview">Project Overview</a>
+2. <a href="#architecture--structure">Architecture & Structure</a>
+3. <a href="#server-documentation">Server Documentation</a>
+4. <a href="#frontend-documentation">Frontend Documentation</a>
+5. <a href="#api-endpoints">API Endpoints</a>
+6. <a href="#environment-configuration">Environment Configuration</a>
+7. <a href="#setup--deployment">Setup & Deployment</a><p>---</p><h2>Project Overview</h2>Chat App V1.2 is a full-stack real-time chat application built with:
+- <strong>Frontend:</strong> React 18+ with Vite
+- <strong>Backend:</strong> Node.js + Express
+- <strong>Database:</strong> MongoDB
+- <strong>Cache:</strong> Redis
+- <strong>Real-time Communication:</strong> WebSocket
+- <strong>Authentication:</strong> JWT<strong>Key Features:</strong>
+- User authentication & registration
+- Real-time messaging
+- Online user presence
+- Message reactions & interactions
+- Profile management
+- Avatar selection
+- Group chat support<p>---</p><h2>Architecture & Structure</h2><h3>Directory Layout</h3><p>\<code>\</code>\`
+Chat_appV1.2/
+├── frontend/                    # React application
+│   ├── src/
+│   │   ├── api/               # API integration layer
+│   │   ├── components/        # React components
+│   │   ├── pages/             # Page components
+│   │   ├── context/           # React context for state
+│   │   ├── store/             # State management (Zustand/Redux)
+│   │   ├── hooks/             # Custom hooks
+│   │   ├── utils/             # Utility functions
+│   │   ├── styles/            # CSS/Tailwind
+│   │   └── sockets/           # WebSocket client
+│   └── package.json
+│
+├── server/                      # Node.js backend
+│   ├── controllers/            # Request handlers
+│   ├── models/                 # Database models
+│   ├── routes/                 # API routes
+│   ├── middleware/             # Express middleware
+│   ├── services/               # Business logic
+│   ├── sockets/                # WebSocket server
+│   ├── config/                 # Configuration files
+│   └── package.json
+│
+├── .env                        # Environment variables
+├── Procfile                    # Deployment configuration
+└── README.md                   # Project documentation</p><p>\<code>\</code>\`</p>
+<h2>Server Documentation</h2><h3>Server Entry Point</h3><pre><code class="language-javascript">
+require("dotenv").config();<p>const express = require("express");
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
+const compression = require("compression");
+const path = require("path");
+const jwt = require("jsonwebtoken");
+const { Server } = require("socket.io");</p><p>const connectDB = require("./config/db");</p><p>const authRoutes = require("./routes/authRoutes");
+const messageRoutes = require("./routes/messageRoutes");
+const profileRoutes = require("./routes/profileRoutes");
+const uploadRoutes = require("./routes/uploadRoutes");
+const limiter = require("./middleware/ratelimit");</p><p>const app = express();</p><p>connectDB();</p><p>app.use(express.json());
+app.use(cookieParser());</p><p>// CORS Configuration
+const corsOptions = {
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+};</p><p>app.use(cors(corsOptions));
+app.use(compression());
+app.use(limiter);</p><p>// API Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/messages", messageRoutes);
+app.use("/api/profile", profileRoutes);
+app.use("/api/uploads", uploadRoutes);</p><p>// Health check endpoint
+app.get("/api/health", (req, res) => {
+    res.json({ status: "OK", timestamp: new Date().toISOString() });
+});</p><p>// Serve static files from the React app build directory
+app.use(express.static(path.join(__dirname, '../frontend/dist')));</p><p>// Catch all handler: send back React's index.html file for any non-API routes
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+});</p><p>// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error("Server Error:", err);
+    res.status(err.status || 500).json({ 
+        error: process.env.NODE_ENV === 'production' ? 'Internal Server Error' : err.message 
+    });
+});</p><p>const PORT = process.env.PORT || 4000;</p><p>const server = app.listen(PORT, () => {
+    console.log(<code>✅ Server running on port ${PORT}</code>);
+    console.log(<code>🌐 Frontend URL: ${process.env.FRONTEND_URL || "http://localhost:5173"}</code>);
+});</p><p>// Socket.io Configuration
+const io = new Server(server, {
+    cors: corsOptions,
+    reconnectionDelay: 1000,
+    reconnectionDelayMax: 5000,
+    reconnectionAttempts: 5
+});</p><p>const onlineUsers = new Map();</p><p>// Socket authentication middleware
+io.use((socket, next) => {
+    try {
+        const token = socket.handshake.auth.token;
+        
+        if (!token) {
+            return next(new Error('Authentication error: Missing token'));
+        }</p><p>        const userData = jwt.verify(token, process.env.JWTPRIVATEKEY);
+        socket.userId = userData._id;
+        socket.userEmail = userData.email;
+        next();
+    } catch (error) {
+        console.error("Socket Auth Error:", error.message);
+        next(new Error('Authentication error: Invalid token'));
+    }
+});</p></code></pre><h3>Controllers</h3><p>#### authController.js</p><pre><code class="language-javascript">
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const { User, validateRegister, validateLogin } = require("../models/User");<p>exports.register = async(req, res) => {</p><p>    try {</p><p>        const { error } = validateRegister(req.body);
+        if (error) {
+            return res.status(400).json({ message: error.details[0].message });
+        }</p><p>        const { firstName, lastName, email, password } = req.body;</p><p>        const existingUser = await User.findOne({ email });</p><p>        if (existingUser) {
+            return res.status(400).json({ message: "User already exists" });
+        }</p><p>        const salt = await bcrypt.genSalt(Number(process.env.SALT));</p><p>        const hashedPassword = await bcrypt.hash(password, salt);</p><p>        const user = new User({
+            firstName,
+            lastName,
+            email,
+            password: hashedPassword,
+            emailVerified: false
+        });</p><p>        await user.save();</p><p>        const secret = process.env.JWTPRIVATEKEY + user.password;</p><p>        const token = jwt.sign({ _id: user._id }, secret, { expiresIn: '1h' });</p><p>        res.status(201).json({ message: "User registered successfully. Please verify your email.", verificationLink: <code>http://localhost:5173/verify/${user._id}/${token}</code> });</p><p>    } catch (error) {</p><p>        res.status(500).json({ message: "Server error" });</p><p>    }</p><p>};
+exports.login = async(req, res) => {</p>\n... [file continues] ...
+</code></pre><p>#### avatarController.js</p><pre><code class="language-javascript">
+const Avatar = require("../models/Avatar");<p>exports.createAvatar = async(req, res) => {</p><p>    try {</p><p>        const { link } = req.body;</p><p>        const avatar = new Avatar({ link });</p><p>        await avatar.save();</p><p>        res.json({
+            message: "Avatar added",
+            avatar
+        });</p><p>    } catch (error) {</p><p>        res.status(500).json({ message: "Server error" });</p><p>    }</p><p>};</p><p>exports.getAvatars = async(req, res) => {</p><p>    const avatars = await Avatar.find();</p><p>    res.json(avatars);</p>};\n... [file continues] ...
+</code></pre><p>#### messageController.js</p><pre><code class="language-javascript">
+const Message = require("../models/Message");
+const { User } = require("../models/User");
+const redisClient = require("../config/redis");<p>exports.getMessages = async(req, res) => {
+    const { userId } = req.params;
+    const { channel = "general", limit = 50, offset = 0 } = req.query;</p><p>    const ourUserId = req.user._id;
+    const cacheKey = <code>messages:${ourUserId}:${userId}:${channel}:${limit}:${offset}</code>;</p><p>    try {
+        // Check cache first
+        const cachedMessages = await redisClient.get(cacheKey);
+        if (cachedMessages) {
+            return res.json(JSON.parse(cachedMessages));
+        }</p><p>        // Mark messages from the other user as read
+        await Message.updateMany({
+            sender: userId,
+            recipient: ourUserId,
+            read: false,
+            channel: channel
+        }, {
+            read: true,
+            $push: {
+                readBy: {
+                    user: ourUserId,
+                    readAt: new Date()
+                }
+            }
+        });</p><p>        const messages = await Message.find({
+            $or: [
+                { sender: ourUserId, recipient: userId, channel: channel },
+                { sender: userId, recipient: ourUserId, channel: channel }
+            ]
+        })
+        .populate("sender", "username avatar")
+        .populate("recipient", "username avatar")
+        .populate("readBy.user", "username")
+        .sort({ createdAt: 1 })
+        .limit(parseInt(limit))
+        .skip(parseInt(offset));</p><p>        // Cache for 5 minutes
+        await redisClient.setEx(cacheKey, 300, JSON.stringify(messages));</p>\n... [file continues] ...
+</code></pre><p>#### peopleController.js</p><pre><code class="language-javascript">
+const { User } = require("../models/User");<p>exports.getPeople = async(req, res) => {</p><p>    const users = await User.find();</p><p>    res.json(users);</p>};\n... [file continues] ...
+</code></pre><p>#### profileController.js</p><pre><code class="language-javascript">
+const { User } = require("../models/User");<p>exports.getProfile = async(req, res) => {</p><p>    const user = await User.findById(req.user._id);</p><p>    res.json(user);</p><p>};</p><p>exports.updateProfile = async(req, res) => {</p><p>    const { firstName, lastName, avatarLink } = req.body;</p><p>    const user = await User.findById(req.user._id);</p><p>    user.firstName = firstName;
+    user.lastName = lastName;
+    user.avatarLink = avatarLink;</p><p>    await user.save();</p><p>    res.json(user);</p><p>};</p><p>exports.updateStatus = async(req, res) => {</p><p>    const { status } = req.body;</p><p>    const user = await User.findByIdAndUpdate(req.user._id, { status }, { new: true });</p><p>    res.json(user);</p>};\n... [file continues] ...
+</code></pre>
+<h3>Database Models</h3><p>#### Avatar.js</p><pre><code class="language-javascript">
+const mongoose = require("mongoose");<p>const avatarSchema = new mongoose.Schema({</p><p>    link: {
+        type: String,
+        required: true
+    }</p><p>});</p>module.exports = mongoose.model("Avatar", avatarSchema);</code></pre><p>#### Message.js</p><pre><code class="language-javascript">
+const mongoose = require("mongoose");<p>const messageSchema = new mongoose.Schema({</p><p>    sender: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    },</p><p>    recipient: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    },</p><p>    channel: {
+        type: String,
+        default: "general"
+    },</p><p>    text: {
+        type: String,
+        required: true
+    },</p><p>    messageType: {
+        type: String,
+        enum: ["text", "image", "file", "voice", "system"],
+        default: "text"
+    },</p><p>    attachments: [{
+        filename: String,
+        originalName: String,
+        mimeType: String,
+        size: Number,
+        url: String,
+        thumbnailUrl: String
+    }],</p><p>    reactions: [{
+        emoji: String,
+        users: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User"
+        }],
+        count: {
+            type: Number,
+            default: 0
+        }
+    }],</p><p>    threadId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Message",
+        default: null
+    },</p><p>    replyCount: {
+        type: Number,
+        default: 0
+    },</p><p>    edited: {
+        type: Boolean,
+        default: false
+    },</p><p>    editedAt: Date,</p><p>    read: {
+        type: Boolean,
+        default: false
+    },</p><p>    readBy: [{
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User"
+        },
+        readAt: {
+            type: Date,
+            default: Date.now
+        }
+    }]</p><p>}, { timestamps: true });</p><p>messageSchema.index({ sender: 1, recipient: 1 });
+messageSchema.index({ recipient: 1, read: 1 });
+messageSchema.index({ channel: 1, createdAt: -1 });
+messageSchema.index({ threadId: 1 });</p>module.exports = mongoose.model("Message", messageSchema);</code></pre><p>#### User.js</p><pre><code class="language-javascript">
+const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
+const Joi = require("joi");<p>const userSchema = new mongoose.Schema({
+    firstName: {
+        type: String,
+        required: true
+    },
+    lastName: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    status: {
+        type: String,
+        default: "Available"
+    },
+    emailVerified: {
+        type: Boolean,
+        default: false
+    },
+    avatar: {
+        type: String,
+        default: null
+    }
+}, { timestamps: true });</p><p>// Generate authentication token
+userSchema.methods.generateAuthToken = function() {
+    const token = jwt.sign({
+        _id: this._id,
+        email: this.email,
+        firstName: this.firstName,
+        lastName: this.lastName
+    },
+    process.env.JWTPRIVATEKEY,
+    { expiresIn: "7d" }
+    );
+    return token;
+};</p><p>// Validate registration data
+const validateRegister = (data) => {
+    const schema = Joi.object({
+        firstName: Joi.string().required().label("First Name"),
+        lastName: Joi.string().required().label("Last Name"),
+        email: Joi.string().email().required().label("Email"),
+        password: Joi.string().min(6).required().label("Password"),
+    });
+    return schema.validate(data);
+};</p><p>// Validate login data
+const validateLogin = (data) => {
+    const schema = Joi.object({
+        email: Joi.string().email().required().label("Email"),
+        password: Joi.string().required().label("Password"),
+    });
+    return schema.validate(data);
+};</p><p>const User = mongoose.model("User", userSchema);</p>module.exports = { User, validateRegister, validateLogin };
+module.exports.User = User;</code></pre>
+<h3>API Routes</h3><p>#### authRoutes.js</p><pre><code class="language-javascript">
+const express = require("express");<p>const router = express.Router();</p><p>const {
+    register,
+    login,
+    verifyEmail
+} = require("../controllers/authController");</p><p>router.post("/register", register);</p><p>router.post("/login", login);</p><p>router.get("/:id/verify/:token", verifyEmail);</p>module.exports = router;</code></pre><p>#### avatarRoutes.js</p><pre><code class="language-javascript">
+const express = require("express");<p>const router = express.Router();</p><p>const {
+    createAvatar,
+    getAvatars
+} = require("../controllers/avatarController");</p><p>router.post("/", createAvatar);</p><p>router.get("/", getAvatars);</p>module.exports = router;</code></pre><p>#### messageRoutes.js</p><pre><code class="language-javascript">
+const express = require("express");<p>const router = express.Router();</p><p>const authMiddleware = require("../middleware/authMiddleware");</p><p>const {
+    getMessages,
+    sendMessage,
+    addReaction,
+    getThreadMessages,
+    editMessage,
+    deleteMessage,
+    getUnreadCounts
+} = require("../controllers/messageController");</p><p>router.get("/:userId", authMiddleware, getMessages);
+router.post("/", authMiddleware, sendMessage);
+router.post("/reaction", authMiddleware, addReaction);
+router.get("/thread/:threadId", authMiddleware, getThreadMessages);
+router.put("/:messageId", authMiddleware, editMessage);
+router.delete("/:messageId", authMiddleware, deleteMessage);
+router.get("/unread/counts", authMiddleware, getUnreadCounts);</p>module.exports = router;</code></pre><p>#### profileRoutes.js</p><pre><code class="language-javascript">
+const express = require("express");
+const { updateProfile, updateStatus } = require("../controllers/profileController");
+const protect = require("../middleware/protect");<p>const router = express.Router();</p><p>router.put("/update", protect, updateProfile);
+router.put("/status", protect, updateStatus);</p>module.exports = router;</code></pre><p>#### uploadRoutes.js</p><pre><code class="language-javascript">
+// routes/uploadRoutes.js
+const express = require("express");
+const router = express.Router();
+const path = require("path");
+const fs = require("fs");
+const upload = require("../middleware/upload");<p>// Serve uploaded files statically
+router.use("/files", express.static(path.join(__dirname, "../uploads")));</p><p>// Single file upload
+router.post("/single", upload.single("file"), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+    }</p><p>    const fileUrl = <code>/api/uploads/files/${req.file.filename}</code>;
+    const relativePath = path.relative(path.join(__dirname, "../uploads"), req.file.path);</p><p>    res.json({
+        success: true,
+        file: {
+            filename: req.file.filename,
+            originalName: req.file.originalname,
+            mimeType: req.file.mimetype,
+            size: req.file.size,
+            url: fileUrl,
+            path: relativePath
+        }
+    });
+});</p><p>// Multiple files upload
+router.post("/multiple", upload.array("files", 10), (req, res) => {
+    if (!req.files || req.files.length === 0) {
+        return res.status(400).json({ error: "No files uploaded" });
+    }</p><p>    const files = req.files.map(file => ({
+        filename: file.filename,
+        originalName: file.originalname,
+        mimeType: file.mimetype,
+        size: file.size,
+        url: <code>/api/uploads/files/${file.filename}</code>,
+        path: path.relative(path.join(__dirname, "../uploads"), file.path)
+    }));</p><p>    res.json({
+        success: true,
+        files: files,
+        count: files.length
+    });
+});</p><p>// Image upload with thumbnail generation
+router.post("/image", upload.single("file"), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: "No image uploaded" });
+    }</p><p>    if (!req.file.mimetype.startsWith("image/")) {
+        // Delete the uploaded file if it's not an image
+        fs.unlinkSync(req.file.path);
+        return res.status(400).json({ error: "Only image files are allowed" });
+    }</p><p>    const fileUrl = <code>/api/uploads/files/${req.file.filename}</code>;</p><p>    res.json({
+        success: true,
+        image: {
+            filename: req.file.filename,
+            originalName: req.file.originalname,
+            mimeType: req.file.mimetype,
+            size: req.file.size,
+            url: fileUrl,
+            thumbnailUrl: fileUrl // For now, same as main image
+        }
+    });
+});</p><p>// Voice message upload
+router.post("/voice", upload.single("audio"), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: "No audio file uploaded" });
+    }</p><p>    if (!req.file.mimetype.startsWith("audio/")) {
+        fs.unlinkSync(req.file.path);
+        return res.status(400).json({ error: "Only audio files are allowed" });
+    }</p><p>    const fileUrl = <code>/api/uploads/files/${req.file.filename}</code>;</p><p>    res.json({
+        success: true,
+        audio: {
+            filename: req.file.filename,
+            originalName: req.file.originalname,
+            mimeType: req.file.mimetype,
+            size: req.file.size,
+            url: fileUrl,
+            duration: req.body.duration || null
+        }
+    });
+});</p><p>// Delete uploaded file
+router.delete("/files/:filename", (req, res) => {
+    const filename = req.params.filename;
+    const filePath = path.join(__dirname, "../uploads", filename);</p><p>    if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+        res.json({ success: true, message: "File deleted successfully" });
+    } else {
+        res.status(404).json({ error: "File not found" });
+    }
+});</p><p>// Get file info
+router.get("/files/:filename/info", (req, res) => {
+    const filename = req.params.filename;
+    const filePath = path.join(__dirname, "../uploads", filename);</p><p>    if (fs.existsSync(filePath)) {
+        const stats = fs.statSync(filePath);
+        res.json({
+            filename: filename,
+            size: stats.size,
+            createdAt: stats.birthtime,
+            modifiedAt: stats.mtime
+        });
+    } else {
+        res.status(404).json({ error: "File not found" });
+    }
+});</p>module.exports = router;</code></pre>
+<h3>Middleware</h3><p>#### authMiddleware.js</p><pre><code class="language-javascript">
+const jwt = require("jsonwebtoken");<p>const authMiddleware = (req, res, next) => {</p><p>    const token = req.cookies.authToken;</p><p>    if (!token) {
+        return res.status(401).json({ message: "Access denied" });
+    }</p><p>    try {</p><p>        const decoded = jwt.verify(
+            token,
+            process.env.JWTPRIVATEKEY
+        );</p><p>        req.user = decoded;</p><p>        next();</p><p>    } catch (error) {</p><p>        res.status(401).json({ message: "Invalid token" });</p><p>    }</p><p>};</p>module.exports = authMiddleware;</code></pre><p>#### errorMiddleware.js</p><pre><code class="language-javascript">
+const errorMiddleware = (err, req, res, next) => {<p>    console.error(err);</p><p>    res.status(500).json({
+        message: "Internal Server Error"
+    });</p><p>};</p>module.exports = errorMiddleware;</code></pre><p>#### protect.js</p><pre><code class="language-javascript">
+const jwt = require("jsonwebtoken");<p>async function protect(req) {
+    return new Promise((resolve, reject) => {
+        const token = req.cookies?.authToken;
+        if (token) {
+            jwt.verify(token, process.env.JWTPRIVATEKEY, {}, (err, userData) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(userData);
+                }
+            });
+        } else {
+            reject("no token");
+        }
+    });
+}</p>module.exports = protect;
+</code></pre><p>#### ratelimit.js</p><pre><code class="language-javascript">
+const rateLimit = require("express-rate-limit");const limiter = rateLimit({
+    windowMs: 15 <em> 60 </em> 1000,
+    max: 100
+});module.exports = limiter;</code></pre><p>#### upload.js</p><pre><code class="language-javascript">
+// middleware/upload.js
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");<p>// Ensure uploads directory exists
+const uploadsDir = path.join(__dirname, "../uploads");
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}</p><p>// Storage configuration for different file types
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        let uploadPath = uploadsDir;</p><p>        // Create subdirectories for organization
+        if (file.mimetype.startsWith("image/")) {
+            uploadPath = path.join(uploadsDir, "images");
+        } else if (file.mimetype.startsWith("audio/") || file.mimetype.startsWith("video/")) {
+            uploadPath = path.join(uploadsDir, "media");
+        } else {
+            uploadPath = path.join(uploadsDir, "files");
+        }</p><p>        if (!fs.existsSync(uploadPath)) {
+            fs.mkdirSync(uploadPath, { recursive: true });
+        }</p><p>        cb(null, uploadPath);
+    },
+    filename: (req, file, cb) => {
+        // Generate unique filename with timestamp and random string
+        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1E9);
+        const extension = path.extname(file.originalname);
+        const basename = path.basename(file.originalname, extension);
+        cb(null, <code>${basename}-${uniqueSuffix}${extension}</code>);
+    }
+});</p><p>// File filter for security
+const fileFilter = (req, file, cb) => {
+    // Allowed file types
+    const allowedTypes = [
+        // Images
+        "image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml",
+        // Documents
+        "application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "text/plain", "text/csv",
+        // Audio/Video
+        "audio/mpeg", "audio/wav", "audio/ogg", "audio/mp4",
+        "video/mp4", "video/avi", "video/mov", "video/wmv",
+        // Archives
+        "application/zip", "application/x-rar-compressed", "application/x-7z-compressed"
+    ];</p><p>    if (allowedTypes.includes(file.mimetype)) {
+        cb(null, true);
+    } else {
+        cb(new Error(<code>File type ${file.mimetype} is not allowed</code>), false);
+    }
+};</p>// Configure multer with limits for large files
+const upload = multer({
+    storage,
+    fileFilter,
+    limits: {
+        fileSize: 100 <em> 1024 </em> 1024, // 100MB limit
+        files: 10 // Maximum 10 files per upload
+    }
+});// Export different upload configurations
+module.exports = {
+    single: (fieldName) => upload.single(fieldName),
+    array: (fieldName, maxCount) => upload.array(fieldName, maxCount || 10),
+    fields: (fields) => upload.fields(fields),
+    any: () => upload.any()
+};</code></pre>
+<h2>Frontend Documentation</h2><h3>React Components\n</h3>
+#### Pages\n
+<strong>Chat.jsx</strong><pre><code class="language-jsx">
+import ChatLayout from "../components/layout/ChatLayout";<p>export default function Chat() {</p>  return <ChatLayout />;}\n... [component continues] ...
+</code></pre><strong>ChatHome.jsx</strong><pre><code class="language-jsx">
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { motion } from "framer-motion";
+import ChatMessages from "../components/chat/ChatMessages";
+import MessageInputForm from "../components/chat/MessageInputForm";
+import Nav from "../components/chat/Nav";
+import OnlineUsersList from "../components/chat/OnlineUserList";
+import TopBar from "../components/chat/TopBar";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";<p>const socketUrl = "ws://localhost:4000";</p><p>const ChatHome = () => {
+  const [ws, setWs] = useState(null);
+  const [onlinePeople, setOnlinePeople] = useState({});
+  const [offlinePeople, setOfflinePeople] = useState({});
+  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState("");
+  const { user } = useAuth();
+  const navigate = useNavigate();</p><p>  const handleMessage = (ev) => {
+    const messageData = JSON.parse(ev.data);
+    if ("online" in messageData) {
+      showOnlinePeople(messageData.online);
+    } else if ("text" in messageData) {
+      if (messageData.sender === selectedUserId) {
+        setMessages((prev) => [...prev, { ...messageData }]);
+      }
+    }
+  };</p><p>  const connectToWebSocket = () => {
+    const ws = new WebSocket(socketUrl);
+    ws.addEventListener("message", handleMessage);
+    setWs(ws);
+  };</p><p>  const sendMessage = (ev) => {
+    if (ev) ev.preventDefault();
+    if (newMessage && selectedUserId && ws) {
+      ws.send(JSON.stringify({ text: newMessage, recipient: selectedUserId }));
+      setNewMessage("");
+      setMessages((prev) => [
+        ...prev,
+        {
+          text: newMessage,
+          sender: user._id,
+          recipient: selectedUserId,
+          _id: Date.now(),
+        },
+      ]);
+    }
+  };</p><p>  useEffect(() => {
+    if (!user) {
+      navigate("/");
+    }
+  }, [user, navigate]);</p>  return (
+    <div className="flex min-h-screen bg-slate-950 relative overflow-hidden">
+      {/<em> Animated Background </em>/}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.08),transparent_50%)] animate-pulse"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.06),transparent_50%)] animate-pulse delay-1000"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(16,185,129,0.05),transparent_50%)] animate-pulse delay-2000"></div>
+      </div>      {/<em> Floating Elements </em>/}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <motion.div
+          animate={{
+            x: [0, 30, 0],
+            y: [0, -20, 0],
+            rotate: [0, 180, 360],
+          }}
+\n... [component continues] ...
+</code></pre><strong>Design.jsx</strong><pre><code class="language-jsx">
+import React, { useState } from "react";
+import { motion } from "framer-motion";<p>const Design = () => {
+  const [selectedComponent, setSelectedComponent] = useState("button");
+  const [customStyles, setCustomStyles] = useState({
+    backgroundColor: "#3b82f6",
+    color: "#ffffff",
+    borderRadius: "8px",
+    padding: "12px 24px",
+    fontSize: "16px",
+    fontWeight: "600"
+  });
+  const [savedDesigns, setSavedDesigns] = useState([
+    { id: 1, name: "Blue Button", styles: { backgroundColor: "#3b82f6", color: "#ffffff", borderRadius: "8px", padding: "12px 24px" } },
+    { id: 2, name: "Green Card", styles: { backgroundColor: "#10b981", color: "#ffffff", borderRadius: "12px", padding: "16px" } }
+  ]);</p><p>  const saveDesign = () => {
+    const newDesign = {
+      id: savedDesigns.length + 1,
+      name: <code>Design ${savedDesigns.length + 1}</code>,
+      styles: customStyles
+    };
+    setSavedDesigns([...savedDesigns, newDesign]);
+  };</p><p>  const loadDesign = (design) => {
+    setCustomStyles(design.styles);
+  };</p><p>  const components = [
+    { id: "button", name: "Button", icon: "🔘" },
+    { id: "card", name: "Card", icon: "📄" },
+    { id: "input", name: "Input", icon: "📝" },
+    { id: "modal", name: "Modal", icon: "📋" },
+    { id: "chat", name: "Chat Bubble", icon: "💬" }
+  ];</p><p>  const handleStyleChange = (property, value) => {
+    setCustomStyles(prev => ({ ...prev, [property]: value }));
+  };</p>  const renderComponent = () => {
+    switch (selectedComponent) {
+      case "button":
+        return (
+          <motion.button
+            className="font-semibold transition-all duration-300 hover:scale-105"
+            style={customStyles}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Custom Button
+          </motion.button>
+        );
+      case "card":
+        return (
+          <motion.div
+            className="p-6 rounded-lg shadow-lg"
+            style={{ backgroundColor: customStyles.backgroundColor, color: customStyles.color, borderRadius: customStyles.borderRadius }}
+            whileHover={{ y: -5 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
+            <h3 className="text-xl font-bold mb-2">Interactive Card</h3>
+            <p>This is a customizable card component with hover effects.</p>
+          </motion.div>
+        );
+      case "input":
+        return (
+          <motion.input
+            type="text"
+            placeholder="Type something..."
+            className="border rounded-lg focus:outline-none focus:ring-2 transition-all duration-300"
+            style={{
+              ...customStyles,
+              borderColor: customStyles.backgroundColor,
+              borderWidth: "2px"
+            }}
+            whileFocus={{ scale: 1.02 }}
+\n... [component continues] ...
+</code></pre><strong>Developer.jsx</strong><pre><code class="language-jsx">
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { useAuth } from "../context/AuthContext";
+import axios from "axios";
+import {
+  Users,
+  MessageCircle,
+  TrendingUp,
+  Clock,
+  BarChart3,
+  DollarSign,
+  Activity,
+  Zap,
+  Star,
+  Heart,
+  Sparkles
+} from "lucide-react";<p>const Developer = () => {
+  const { user } = useAuth();
+  const [userStats, setUserStats] = useState({});
+  const [revenue, setRevenue] = useState(0);
+  const [researchData, setResearchData] = useState([]);</p><p>  useEffect(() => {
+    // Mock data for demonstration
+    setUserStats({
+      totalUsers: 1250,
+      activeUsers: 890,
+      messagesSent: 45670,
+      avgSessionTime: "24m 32s"
+    });
+    setRevenue(15420.50);
+    setResearchData([
+      { feature: "Real-time Messaging", usage: 95, feedback: 4.8 },
+      { feature: "File Sharing", usage: 78, feedback: 4.6 },
+      { feature: "Voice Calls", usage: 45, feedback: 4.3 },
+      { feature: "Status Updates", usage: 67, feedback: 4.7 }
+    ]);
+  }, []);</p><p>  const handleGenerateRevenue = () => {
+    // Mock revenue generation
+    setRevenue(prev => prev + Math.random() * 100);
+  };</p>  return (
+    <div className="min-h-screen bg-slate-950 text-white p-8 relative overflow-hidden">
+      {/<em> Animated Background </em>/}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.08),transparent_50%)] animate-pulse"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.06),transparent_50%)] animate-pulse delay-1000"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(16,185,129,0.05),transparent_50%)] animate-pulse delay-2000"></div>
+      </div>      {/<em> Floating Elements </em>/}
+      <div className="absolute inset-0 overflow-hidden">
+        <motion.div
+          animate={{
+            x: [0, 40, 0],
+            y: [0, -30, 0],
+            rotate: [0, 180, 360],
+          }}
+          transition={{
+            duration: 18,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute top-20 left-20 w-32 h-32 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-full blur-xl"
+        />
+        <motion.div
+          animate={{
+            x: [0, -35, 0],
+            y: [0, 25, 0],
+            scale: [1, 1.2, 1],
+          }}
+          transition={{
+            duration: 22,
+            repeat: Infinity,
+            ease: "easeInOut",
+\n... [component continues] ...
+</code></pre><strong>Home.jsx</strong><pre><code class="language-jsx">
+import React from "react";
+import Hero from "../components/landing/Hero";
+import { useAuth } from "../context/AuthContext";
+import LandingNav from "../components/landing/LandingNav";
+import Footer from "../components/landing/Footer";
+import Features from "../components/landing/Features";
+import Payments from "../components/landing/Payments";
+import CustomerLogos from "../components/landing/CustomerLogos";<p>const Home = () => {
+  const { user } = useAuth();</p>  return (
+    <div className="min-h-screen bg-slate-950 relative overflow-hidden">
+      {/<em> Animated Background </em>/}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.08),transparent_50%)] animate-pulse"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.06),transparent_50%)] animate-pulse delay-1000"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(16,185,129,0.05),transparent_50%)] animate-pulse delay-2000"></div>
+      </div>      <div className="relative z-10">
+        <LandingNav />
+        <Hero />
+        <Features />
+        <Payments />
+        <CustomerLogos />
+        <Footer />
+      </div>
+    </div>
+  );
+};export default Home;
+\n... [component continues] ...
+</code></pre><strong>LoadingDemo.jsx</strong><pre><code class="language-jsx">
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import LoadingPage from "../components/LoadingPage";
+import { useGlobalLoading } from "../App";
+import { loadingConfigs } from "../hooks/useLoading";<p>const LoadingDemo = () => {
+  const [selectedVariant, setSelectedVariant] = useState("default");
+  const [showGlobalLoading, setShowGlobalLoading] = useState(false);
+  const globalLoading = useGlobalLoading();</p><p>  const variants = [
+    { id: "default", name: "Default", description: "Classic spinning loader with heart" },
+    { id: "pulse", name: "Pulse", description: "Pulsing animated icon" },
+    { id: "spinner", name: "Spinner", description: "Dual rotating spinners" },
+    { id: "dots", name: "Dots", description: "Bouncing dots animation" },
+    { id: "wave", name: "Wave", description: "Audio-style wave bars" },
+    { id: "detailed", name: "Detailed", description: "Step-by-step loading with icons" },
+    { id: "logo", name: "Logo", description: "Animated logo with glow effect" }
+  ];</p><p>  const handleGlobalLoadingDemo = async (config) => {
+    setShowGlobalLoading(true);
+    globalLoading.startLoading(config.message, config.variant);</p><p>    // Simulate loading time
+    await new Promise(resolve => setTimeout(resolve, 3000));</p><p>    globalLoading.stopLoading();
+    setShowGlobalLoading(false);
+  };</p><p>  const handleProgressDemo = async () => {
+    globalLoading.startLoading("Processing your request...", "spinner");</p>    for (let i = 0; i <= 100; i += 10) {
+      globalLoading.updateProgress(i);
+      await new Promise(resolve => setTimeout(resolve, 200));
+    }<p>    globalLoading.stopLoading();
+  };</p>  return (
+    <div className="min-h-screen bg-slate-950 text-white p-8">
+      <div className="max-w-6xl mx-auto">
+        {/<em> Header </em>/}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-12"
+        >
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent mb-4">
+            Loading Page Showcase
+          </h1>
+          <p className="text-slate-400 text-lg">
+            Interactive loading animations for your chat application
+          </p>
+        </motion.div>        {/<em> Global Loading Demo </em>/}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-slate-900/50 backdrop-blur-sm rounded-2xl p-8 mb-8 border border-slate-700/50"
+        >
+          <h2 className="text-2xl font-bold mb-6 text-center">Global Loading States</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Object.entries(loadingConfigs).map(([key, config]) => (
+              <motion.button
+                key={key}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => handleGlobalLoadingDemo(config)}
+                disabled={showGlobalLoading}
+                className="p-4 bg-slate-800/50 hover:bg-slate-700/50 rounded-xl border border-slate-600/30 transition-all duration-200 text-left disabled:opacity-50"
+              >
+                <h3 className="font-semibold text-indigo-400 capitalize mb-2">{key.replace(/([A-Z])/g, ' $1')}</h3>
+                <p className="text-sm text-slate-400">{config.message}</p>
+\n... [component continues] ...
+</code></pre><strong>Login.jsx</strong><pre><code class="language-jsx">
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import { useAuth } from "../context/AuthContext";
+import { useGlobalLoading } from "../App";
+import { motion, AnimatePresence } from "framer-motion";
+import { Eye, EyeOff, Mail, Lock, ArrowRight, Sparkles } from "lucide-react";<p>const Login = () => {
+    const [data, setData] = useState({
+        email: "",
+        password: "",
+    });
+    const [showPassword, setShowPassword] = useState(false);
+    const [rememberMe, setRememberMe] = useState(false);</p><p>    const globalLoading = useGlobalLoading();</p><p>    const handleChange = (e) => {
+        setData({ ...data, [e.target.name]: e.target.value });
+    };</p><p>    const navigate = useNavigate();
+    const { isAuthenticated, setAuthenticated } = useAuth();</p><p>    useEffect(() => {
+        if (isAuthenticated) {
+            navigate("/");
+        }
+    }, [isAuthenticated]);</p><p>    const handleSubmit = async (e) => {
+        e.preventDefault();
+        globalLoading.startLoading("Signing you in...", "pulse");</p><p>        try {
+            const url = "/api/user/login";
+            const response = await axios.post(url, data, {
+                withCredentials: true,
+            });</p>            if (response.status === 200) {
+                toast.success(response.data.message || "Login successful!");
+                setAuthenticated(true);
+            }
+        } catch (error) {
+            if (error.response && error.response.status >= 400 && error.response.status <= 500) {
+                toast.error(error.response.data.message || "Login failed");
+            } else {
+                toast.error("Network error. Please try again.");
+            }
+        } finally {
+            globalLoading.stopLoading();
+        }
+    };<p>    const isFormValid = data.email.trim() && data.password.trim();</p>    return (
+        <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 relative overflow-hidden">
+            {/<em> Animated Background </em>/}
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.15),transparent_50%)] animate-pulse"></div>
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.12),transparent_50%)] animate-pulse delay-1000"></div>
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(16,185,129,0.1),transparent_50%)] animate-pulse delay-2000"></div>
+            </div>            {/<em> Floating Elements </em>/}
+            <div className="absolute inset-0 overflow-hidden">
+                <motion.div
+                    animate={{
+                        x: [0, 30, 0],
+                        y: [0, -20, 0],
+                    }}
+                    transition={{
+                        duration: 8,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                    }}
+\n... [component continues] ...
+</code></pre><strong>Profile.jsx</strong><pre><code class="language-jsx">
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { motion } from "framer-motion";
+import Nav from "../components/chat/Nav";
+import { useAuth } from "../context/AuthContext";
+import SelectAvatar from "../components/SelectAvatar";
+import { User, Mail, Save, Sparkles, Heart, Star } from "lucide-react";
+import { useGlobalLoading } from "../App";<p>const Profile = () => {
+  const { user } = useAuth();
+  const [formData, setFormData] = useState({});
+  const [selectedLink, setSelectedLink] = useState("");
+  const globalLoading = useGlobalLoading();</p><p>  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };</p><p>  const handleSubmit = async (e) => {
+    e.preventDefault();
+    globalLoading.startLoading("Updating your profile...", "pulse");</p><p>    try {
+      const response = await axios.put("/api/profile/update", {
+        ...formData,
+        avatarLink: selectedLink,
+      });
+      console.log(response.data);
+      // Also update status
+      if (formData.status) {
+        await axios.put("/api/profile/status", { status: formData.status });
+      }
+      globalLoading.stopLoading();
+    } catch (error) {
+      console.error(error);
+      globalLoading.stopLoading();
+    }
+  };</p><p>  useEffect(() => {
+    setFormData(user);
+  }, [user]);</p>  return (
+    <div className="flex min-h-screen bg-slate-950 relative overflow-hidden">
+      {/<em> Animated Background </em>/}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.08),transparent_50%)] animate-pulse"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.06),transparent_50%)] animate-pulse delay-1000"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(16,185,129,0.05),transparent_50%)] animate-pulse delay-2000"></div>
+      </div>      {/<em> Floating Elements </em>/}
+      <div className="absolute inset-0 overflow-hidden">
+        <motion.div
+          animate={{
+            x: [0, 40, 0],
+            y: [0, -30, 0],
+            rotate: [0, 180, 360],
+          }}
+          transition={{
+            duration: 18,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute top-20 left-20 w-32 h-32 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-full blur-xl"
+        />
+        <motion.div
+          animate={{
+            x: [0, -35, 0],
+            y: [0, 25, 0],
+            scale: [1, 1.2, 1],
+          }}
+          transition={{
+            duration: 22,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 3
+          }}
+\n... [component continues] ...
+</code></pre><strong>Register.jsx</strong><pre><code class="language-jsx">
+import { useState } from "react";
+import axios from "axios";
+import { toast } from "react-hot-toast";
+import { Link } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Sparkles, CheckCircle, XCircle } from "lucide-react";<p>const Register = () => {
+    const [data, setData] = useState({
+        email: "",
+        firstName: "",
+        lastName: "",
+        password: "",
+    });
+    const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [acceptTerms, setAcceptTerms] = useState(false);
+    const [passwordStrength, setPasswordStrength] = useState(0);</p><p>    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setData({ ...data, [name]: value });</p><p>        if (name === 'password') {
+            calculatePasswordStrength(value);
+        }
+    };</p><p>    const calculatePasswordStrength = (password) => {
+        let strength = 0;
+        if (password.length >= 8) strength += 25;
+        if (/[A-Z]/.test(password)) strength += 25;
+        if (/[a-z]/.test(password)) strength += 25;
+        if (/[0-9]/.test(password)) strength += 25;
+        setPasswordStrength(strength);
+    };</p>    const getPasswordStrengthColor = () => {
+        if (passwordStrength < 25) return "bg-red-500";
+        if (passwordStrength < 50) return "bg-orange-500";
+        if (passwordStrength < 75) return "bg-yellow-500";
+        return "bg-green-500";
+    };    const getPasswordStrengthText = () => {
+        if (passwordStrength < 25) return "Weak";
+        if (passwordStrength < 50) return "Fair";
+        if (passwordStrength < 75) return "Good";
+        return "Strong";
+    };<p>    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!acceptTerms) {
+            toast.error("Please accept the Terms and Conditions");
+            return;
+        }</p><p>        setIsLoading(true);</p>        try {
+            const url = "/api/user/register";
+            const { data: res } = await axios.post(url, data);
+            toast.success(res.message || "Registration successful!");
+            // Optionally redirect to login or auto-login
+        } catch (error) {
+            if (error.response && error.response.status >= 300 && error.response.status <= 500) {
+                toast.error(error.response.data.message || "Registration failed");
+            } else {
+                toast.error("Network error. Please try again.");
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };<p>    const isFormValid = data.email.trim() && data.firstName.trim() && data.lastName.trim() && data.password.trim() && acceptTerms;</p>    return (
+        <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 relative overflow-hidden">
+\n... [component continues] ...
+</code></pre><strong>TestChat.jsx</strong><pre><code class="language-jsx">
+import React, { useState, useRef, useEffect } from "react";
+import { motion } from "framer-motion";<p>const TestChat = () => {
+  const [messages, setMessages] = useState([
+    { id: 1, sender: "Alice", text: "Hey! How are you?", time: "10:30 AM", type: "text" },
+    { id: 2, sender: "Bob", text: "I'm good! Thanks for asking.", time: "10:31 AM", type: "text" },
+    { id: 3, sender: "Alice", text: "Great! Check out this image", time: "10:32 AM", type: "image", url: "https://via.placeholder.com/300x200" },
+    { id: 4, sender: "Bob", text: "Nice! 👍", time: "10:33 AM", type: "text" },
+    { id: 5, sender: "Alice", text: "Voice message test", time: "10:34 AM", type: "voice", duration: "00:15" }
+  ]);
+  const [newMessage, setNewMessage] = useState("");
+  const [selectedTest, setSelectedTest] = useState("basic");
+  const messagesEndRef = useRef(null);</p><p>  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollTo({
+      top: messagesEndRef.current.scrollHeight,
+      behavior: "smooth"
+    });
+  };</p><p>  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);</p><p>  const sendMessage = () => {
+    if (newMessage.trim()) {
+      const message = {
+        id: messages.length + 1,
+        sender: "You",
+        text: newMessage,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        type: "text"
+      };
+      setMessages([...messages, message]);
+      setNewMessage("");
+    }
+  };</p>  const addTestMessage = (type) => {
+    let message;
+    switch (type) {
+      case "image":
+        message = {
+          id: messages.length + 1,
+          sender: "Test Bot",
+          text: "Image message",
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          type: "image",
+          url: "https://via.placeholder.com/300x200/4f46e5/ffffff?text=Test+Image"
+        };
+        break;
+      case "voice":
+        message = {
+          id: messages.length + 1,
+          sender: "Test Bot",
+          text: "Voice message",
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          type: "voice",
+          duration: "00:23"
+        };
+        break;
+      case "file":
+        message = {
+          id: messages.length + 1,
+          sender: "Test Bot",
+          text: "document.pdf",
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          type: "file",
+          size: "2.5 MB"
+        };
+        break;
+      case "typing":
+        // Simulate typing indicator
+        setTimeout(() => {
+          const message = {
+            id: messages.length + 1,
+            sender: "Test Bot",
+            text: "This message was sent after typing indicator",
+\n... [component continues] ...
+</code></pre><strong>VerifyEmail.jsx</strong><pre><code class="language-jsx">
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { Link, useParams } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";<p>const VerifyEmail = () => {
+    const { id, token } = useParams();
+    const [loading, setLoading] = useState(false);
+    const { isAuthenticated, checkAuth } = useAuth();
+    const navigate = useNavigate();</p><p>    useEffect(() => {
+        checkAuth();
+        if (isAuthenticated) navigate("/");
+    }, []);</p><p>    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                const response = await axios.get(<code>/api/user/${id}/verify/${token}</code>);
+                toast.success(response.data.message);
+                // console.log("Verification successful:", response.data);
+            } catch (error) {
+                setLoading(false);
+                toast.error(error.response.data.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, [id, token]);</p>    return (
+        <div className="bg-gray-900 min-h-screen text-white flex justify-center items-center">
+            {loading && (
+                <div className="mb-10 flex flex-col items-center" role="status">
+                    <svg
+                        aria-hidden="true"
+                        className="w-20 h-20 animate-spin fill-blue-600"
+                        viewBox="0 0 100 101"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.5908C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                            fill="currentColor"
+                        />
+                        <path
+                            d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                            fill="currentFill"
+                        />
+                    </svg>
+                    <span className="my-4 text-lg">Loading...</span>
+                </div>
+            )}
+            {!loading && (
+                <span className="my-4 text-xl font-medium">Verification Successful</span>
+            )}
+            {!loading && !isAuthenticated && (
+                <Link
+                    to={"/login"}
+                    className="inline-flex items-center justify-center px-5 py-3 text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm"
+                >
+                    Login
+                    <svg
+                        className="w-5 h-5 ml-2 -mr-1"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            fillRule="evenodd"
+                            d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                            clipRule="evenodd"
+                        ></path>
+                    </svg>
+                </Link>
+\n... [component continues] ...
+</code></pre><p>
+#### UI Components</p><strong>Avatar.jsx</strong><pre><code class="language-jsx">
+export default function Avatar({ username, userId, avatarLink }) {
+  const colors = [
+    "#90CDF4",
+    "#F56565",
+    "#D6BCFA",
+    "#BC85E0",
+    "#7F9CF5",
+    "#F6AD55",
+    "#F687B3",
+    "#68D391",
+    "#FBBF24",
+    "#4299E1",
+  ];
+  const userIdBase10 = parseInt(userId.substring(10), 16);
+  const colorIndex = userIdBase10 % colors.length;
+  const color = colors[colorIndex];
+  const squircleStyles = {
+    "--squircle-bg-color": color,
+  };
+  return (
+    <div className={<code>squircle relative text-black</code>} style={squircleStyles}>
+      <div
+        className="squircle__inline text-xl text-white uppercase"
+        style={{ textShadow: "0.4px 0.4px 1px gray" }}
+      >
+        {username && avatarLink ? (
+          <img
+            src={avatarLink}
+            className="h-10 w-10 grid place-content-center rounded-full"
+            alt={username[0]}
+          />
+        ) : (
+          <span>{username[0]}</span>
+        )}
+      </div>
+      <style>
+        {`
+        .squircle {
+          --squircle-fg: var(--bg, #ffffff);
+          --squircle-size: 44px;
+          --squircle-radii: 50% / 10%;
+          aspect-ratio: 1;
+          display: grid;
+          grid-template-columns: 1fr;
+          max-width: 80%;
+          width: var(--squircle-size);
+        }
+        .squircle::before,
+        .squircle::after {
+          align-self: center;
+          background-color: var(--squircle-bg-color, #6B8AFD);
+          content: "";
+          grid-column: 1;
+          grid-row: 1;
+          justify-self: center;
+        }
+        .squircle::before,
+        .squircle::after {
+          border-radius: var(--squircle-radii);
+          height: 115%;
+\n... [component continues] ...
+</code></pre><strong>ChatArea.jsx</strong><pre><code class="language-jsx">
+import { useEffect, useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Send,
+  Paperclip,
+  Smile,
+  MoreVertical,
+  Reply,
+  Edit3,
+  Trash2,
+  Download,
+  File,
+  Image,
+  Mic,
+  Phone,
+  Video,
+  Hash,
+  Users,
+  Settings,
+  Search
+} from "lucide-react";
+import { useAuthStore } from "../../store/authStore";
+import { connectSocket } from "../../sockets/socket";
+import MessageList from "./MessageList";
+import MessageInput from "./MessageInput";<p>export default function ChatArea() {
+  const [messages, setMessages] = useState([]);
+  const [onlineUsers, setOnlineUsers] = useState([]);
+  const [isTyping, setIsTyping] = useState(false);
+  const [selectedChannel, setSelectedChannel] = useState("general");
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showChannelInfo, setShowChannelInfo] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+  const selectedUser = "Alice"; // Placeholder</p><p>  const channels = [
+    { id: "general", name: "General", type: "channel", memberCount: 12 },
+    { id: "random", name: "Random", type: "channel", memberCount: 8 },
+    { id: "development", name: "Development", type: "channel", memberCount: 5 },
+    { id: "alice", name: "Alice", type: "dm", status: "online" },
+    { id: "bob", name: "Bob", type: "dm", status: "offline" }
+  ];</p><p>  const { user } = useAuthStore();</p>  useEffect(() => {
+    if (user) {
+      const token = localStorage.getItem("token");
+      if (token) {
+        const socket = connectSocket(token);
+        if (socket) {
+          socket.on("receiveMessage", (data) => {
+            setMessages((prev) => [...prev, {
+              ...data,
+              status: 'delivered',
+              reactions: [],
+              threadCount: 0
+            }]);
+\n... [component continues] ...
+</code></pre><strong>ChatMessages.jsx</strong><pre><code class="language-jsx">
+import React, { useEffect, useRef } from "react";<p>const ChatMessages = ({ messages, userDetails, selectedUserId }) => {
+  const messagesContainerRef = useRef(null);</p><p>  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (container) {
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  }, [messages, messagesContainerRef]);</p>  return (
+    <div
+      className="absolute bottom-24 w-full px-7 lg:px-20 left-0"
+      ref={messagesContainerRef}
+    >
+      {selectedUserId && (
+        <div className="flex flex-col gap-2">
+          {messages.map((message) => (
+            <div
+              key={message._id}
+              className={`text-white ${
+                message.sender !== userDetails._id
+                  ? "bg-blue-600 self-start rounded-r-2xl"
+                  : "bg-blue-700 self-end rounded-l-2xl"
+              } relative group rounded-b-2xl px-5 py-3`}
+            >
+              <div
+                style={{ wordWrap: "break-word" }}
+                className="flex flex-wrap max-w-[500px] overflow-hidden"
+              >
+                {message.text}
+              </div>
+              <div
+                className={`absolute top-0 w-0 h-0 ${
+                  message.sender !== userDetails._id
+                    ? "border-r-blue-600 -left-4 border-r-[20px]"
+                    : "-right-4 border-l-blue-700 border-l-[20px]"
+                } border-b-[20px] border-b-transparent`}
+              ></div>
+            </div>
+          ))}
+        </div>
+      )}
+      {selectedUserId && !messages.length && (
+        <div className="text-gray-500 flex items-end justify-center">
+          Start a conversation
+        </div>
+      )}
+    </div>
+  );
+};export default ChatMessages;\n... [component continues] ...
+</code></pre><strong>ChatWindow.jsx</strong><pre><code class="language-jsx">
+import { useState, useRef, useEffect, memo, useMemo, useCallback } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import Avatar from "../ui/Avatar"
+import { useChatStore } from "../../store/chatStore"
+import { useAuthStore } from "../../store/authStore"
+import Message from "./Message"<p>const ChatWindow = memo(() => {</p><p>    const messages = useChatStore((s) => s.messages) || []
+    const selectedUser = useChatStore((s) => s.selectedUser)
+    const onlineUsers = useChatStore((s) => s.onlineUsers) || []
+    const sendMessage = useChatStore((s) => s.sendMessage)</p><p>    const user = useAuthStore((s) => s.user)</p><p>    const [text, setText] = useState("")
+    const [isTyping, setIsTyping] = useState(false)</p><p>    const bottomRef = useRef(null)
+    const inputRef = useRef(null)</p>    /<em> Auto scroll </em>/
+    useEffect(() => {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" })
+    }, [messages])    /<em> Send message </em>/
+    const handleSend = useCallback(() => {<p>        const message = text.trim()</p><p>        if (!message || !selectedUser || !user?._id) return</p><p>        sendMessage({
+            receiverId: selectedUser,
+            text: message,
+            senderId: user._id
+        })</p><p>        setText("")
+        setIsTyping(false)</p><p>    }, [text, selectedUser, sendMessage, user])</p>    /<em> Enter key send </em>/
+    const handleKeyDown = useCallback((e) => {<p>        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault()
+            handleSend()
+        }</p><p>    }, [handleSend])</p>    /<em> Typing indicator </em>/
+    const handleInputChange = useCallback((e) => {
+        setText(e.target.value)
+        if (selectedUser && e.target.value.trim()) {
+            setIsTyping(true)
+\n... [component continues] ...
+</code></pre><strong>Contact.jsx</strong><pre><code class="language-jsx">
+import React from "react";
+import Avatar from "./Avatar";const Contact = ({
+  userId,
+  username,
+  selectedUserId,
+  setSelectedUserId,
+  isOnline,
+  avatarLink,
+}) => {
+  return (
+    <li
+      key={userId}
+      className={`${
+        selectedUserId === userId ? "bg-blue-600" : ""
+      } capitalize py-2 lg:py-3 px-2 lg:px-5 rounded-[1.3rem] cursor-pointer`}
+      onClick={() => {
+        setSelectedUserId(userId);
+      }}
+    >
+      <Avatar
+        userId={userId}
+        username={username}
+        isOnline={isOnline}
+        avatarLink={avatarLink}
+      />
+      <span className="text-xs lg:text-base text-center">{username}</span>
+      {isOnline && (
+        <span className="text-xs rounded-full bg-green-500 px-2 py-1">
+          Active
+        </span>
+      )}
+    </li>
+  );
+};export default Contact;\n... [component continues] ...
+</code></pre><strong>Message.jsx</strong><pre><code class="language-jsx">
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { format } from 'timeago.js';
+import {
+  Reply,
+  MoreHorizontal,
+  Edit3,
+  Trash2,
+  Heart,
+  ThumbsUp,
+  Smile,
+  MessageCircle,
+  Download,
+  File,
+  Image as ImageIcon,
+  Mic,
+  Play,
+  Pause
+} from "lucide-react";<p>export default function Message({
+  id,
+  text,
+  sender,
+  timestamp,
+  attachments = [],
+  reactions = [],
+  threadCount = 0,
+  edited = false,
+  readBy = [],
+  onReaction,
+  onReply,
+  showAvatar = true,
+  showTimestamp = true,
+  isConsecutive = false,
+  isMine = false
+}) {
+  const [showActions, setShowActions] = useState(false);
+  const [showReactionPicker, setShowReactionPicker] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);</p><p>  const commonReactions = ["❤️", "👍", "👎", "😂", "😮", "😢", "😡"];</p><p>  const handleReaction = (emoji) => {
+    onReaction && onReaction(id, emoji);
+    setShowReactionPicker(false);
+  };</p><p>  const formatTime = (timestamp) => {
+    if (!timestamp) return "";
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };</p><p>  const renderAttachment = (attachment, index) => {
+    const { type, url, name, size } = attachment;</p>    if (type.startsWith('image/')) {
+      return (
+        <motion.div
+\n... [component continues] ...
+</code></pre><strong>MessageInput.jsx</strong><pre><code class="language-jsx">
+import { useState, useRef, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Send,
+  Paperclip,
+  Smile,
+  Mic,
+  Image,
+  File,
+  X,
+  Upload,
+  Loader
+} from "lucide-react";
+import { sendMessage, startTyping, stopTyping } from "../../websocket/socket";
+import toast from "react-hot-toast";<p>export default function MessageInput({ onSendMessage, placeholder = "Type a message..." }) {
+  const [text, setText] = useState("");
+  const [attachments, setAttachments] = useState([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);</p><p>  const inputRef = useRef();
+  const fileRef = useRef();
+  const typingTimeoutRef = useRef();</p><p>  const handleSend = useCallback(() => {
+    if (!text.trim() && attachments.length === 0) return;</p><p>    const messageData = {
+      text: text.trim(),
+      attachments: attachments,
+      timestamp: new Date().toISOString()
+    };</p><p>    onSendMessage(messageData);</p><p>    // Clear input
+    setText("");
+    setAttachments([]);
+    setIsTyping(false);
+    stopTyping && stopTyping();
+  }, [text, attachments, onSendMessage]);</p><p>  const handleKeyPress = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };</p><p>  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setText(value);</p>    // Handle typing indicators
+    if (value && !isTyping) {
+      setIsTyping(true);
+\n... [component continues] ...
+</code></pre><strong>MessageInputForm.jsx</strong><pre><code class="language-jsx">
+import React from "react";const MessageInputForm = ({
+  selectedUserId,
+  newMessage,
+  setNewMessage,
+  sendMessage,
+}) => {
+  return (
+    <>
+      {selectedUserId && (
+        <form onSubmit={sendMessage} className="relative m-4 w-full">
+          <input
+            type="text"
+            id="message-input"
+            className="w-full px-4 py-3 rounded-xl bg-transparent border border-gray-600 text-white placeholder-gray-400"
+            placeholder="Your Message"
+            value={newMessage}
+            onChange={(ev) => setNewMessage(ev.target.value)}
+            required
+          />
+          <button
+            type="submit"
+            className="absolute end-0 top-0 aspect-square h-full font-medium text-white hover:text-blue-400"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12.73a59.769 59.769 0 0 1-18.216 9.605L6 12Z"
+              />
+            </svg>
+          </button>
+        </form>
+      )}
+    </>
+  );
+};export default MessageInputForm;\n... [component continues] ...
+</code></pre><strong>MessageList.jsx</strong><pre><code class="language-jsx">
+import { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import Message from "./Message";<p>export default function MessageList({
+  messages,
+  isTyping,
+  selectedUser,
+  onReaction,
+  onReply
+}) {
+  const bottomRef = useRef();
+  const [visibleMessages, setVisibleMessages] = useState([]);</p><p>  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isTyping]);</p><p>  // Group messages by date
+  const groupMessagesByDate = (messages) => {
+    const groups = [];
+    let currentGroup = null;</p><p>    messages.forEach((message, index) => {
+      const messageDate = new Date(message.createdAt || message.timestamp).toDateString();</p><p>      if (!currentGroup || currentGroup.date !== messageDate) {
+        currentGroup = {
+          date: messageDate,
+          messages: []
+        };
+        groups.push(currentGroup);
+      }</p><p>      currentGroup.messages.push({
+        ...message,
+        showAvatar: index === 0 || messages[index - 1].sender !== message.sender,
+        showTimestamp: index === 0 || messages[index - 1].sender !== message.sender,
+        isConsecutive: index > 0 && messages[index - 1].sender === message.sender
+      });
+    });</p><p>    return groups;
+  };</p><p>  const messageGroups = groupMessagesByDate(messages);</p><p>  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);</p>    if (date.toDateString() === today.toDateString()) {
+      return "Today";
+    } else if (date.toDateString() === yesterday.toDateString()) {
+      return "Yesterday";
+    } else {
+      return date.toLocaleDateString([], {
+        weekday: 'long',
+\n... [component continues] ...
+</code></pre><strong>Nav.jsx</strong><pre><code class="language-jsx">
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";<p>const Nav = () => {
+  const { logout, user } = useAuth();
+  const [isMobile, setIsMobile] = useState(true);
+  const navigate = useNavigate();</p><p>  useEffect(() => {
+    if (!user) {
+      navigate("/login");
+    }
+  }, [user, navigate]);</p>  return (
+    <>
+      <button
+        onClick={() => setIsMobile(!isMobile)}
+        className="flex fixed bottom-5 right-5 h-10 aspect-square lg:hidden bg-blue-600 text-white rounded-full z-50"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          className="w-6 h-6 m-auto"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+          />
+        </svg>
+      </button>
+      {isMobile && (
+        <header className="fixed h-screen w-[150px] z-40 lg:static bg-zinc-800">
+          <Link
+            to="/"
+            className="flex gap-2 items-center justify-center border-b border-gray-600 py-4"
+          >
+            <img
+              src="https://flowbite.com/docs/images/logo.svg"
+              className="h-8"
+              alt="Swift Logo"
+            />
+            <span className="font-semibold text-xl text-white">Swift</span>
+          </Link>
+          <nav className="h-full flex flex-col my-4 justify-between">
+            <div className="flex flex-col gap-5">
+              <Link to="/profile" className="flex items-center gap-2 text-white hover:text-blue-400 px-4">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-6 h-6"
+\n... [component continues] ...
+</code></pre><strong>OnlineUserList.jsx</strong><pre><code class="language-jsx">
+import React, { useState } from "react";
+import Avatar from "./Avatar";
+import Contact from "./Contact";<p>const OnlineUsersList = ({
+  onlinePeople,
+  offlinePeople,
+  selectedUserId,
+  setSelectedUserId,
+}) => {
+  const [searchTerm, setSearchTerm] = useState("");</p><p>  const filteredOnlinePeople = Object.keys(onlinePeople).filter((userId) => {
+    const username = onlinePeople[userId].username || "";
+    return username.toLowerCase().includes(searchTerm.toLowerCase());
+  });</p><p>  const filteredOfflinePeople = Object.keys(offlinePeople).filter((userId) => {
+    const { firstName, lastName } = offlinePeople[userId];
+    const fullName = <code>${firstName} ${lastName}</code>;
+    return fullName.toLowerCase().includes(searchTerm.toLowerCase());
+  });</p>  return (
+    <section className="w-[29%] py-3 border-r border-gray-600 px-2 lg:px-4 bg-zinc-900">
+      <div className="text-white flex items-center gap-2 p-1 px-2">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          className="w-6 h-6 hidden sm:block"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607ZM10.5 7.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+          />
+        </svg>
+        <input
+          type="text"
+          placeholder="Search..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full bg-transparent outline-none text-white placeholder-gray-400"
+        />
+      </div>
+      <div className="max-h-[85vh] overflow-auto no-scrollbar">
+        {filteredOnlinePeople.map((userId) => {
+          const { username, avatarLink } = onlinePeople[userId];
+          return (
+            <Contact
+              key={userId}
+              userId={userId}
+              username={username}
+              selectedUserId={selectedUserId}
+              setSelectedUserId={setSelectedUserId}
+              isOnline={true}
+              avatarLink={avatarLink}
+\n... [component continues] ...
+</code></pre><strong>TopBar.jsx</strong><pre><code class="language-jsx">
+import React from "react";const TopBar = ({
+  setSelectedUserId,
+  selectedUserId,
+  offlinePeople,
+  onlinePeople,
+}) => {
+  return (
+    <div className="absolute right-2 text-white w-full py-5 bg-zinc-800 rounded-lg px-4 flex items-center justify-between">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="w-6 h-6 cursor-pointer"
+        role="button"
+        onClick={() => setSelectedUserId(null)}
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
+        />
+      </svg>
+      {onlinePeople[selectedUserId] ? (
+        <>
+          <span>{onlinePeople[selectedUserId].username}</span>
+          <span className="h-3 w-3 rounded-full bg-green-500"></span>
+        </>
+      ) : (
+        <>
+          <span>{offlinePeople[selectedUserId]?.firstName}</span>
+          <span className="h-3 w-3 rounded-full bg-gray-500"></span>
+        </>
+      )}
+    </div>
+  );
+};export default TopBar;\n... [component continues] ...
+</code></pre><strong>UserList.jsx</strong><pre><code class="language-jsx">
+import { useEffect, useState, useMemo } from "react"
+import { useChatStore } from "../../store/chatStore"
+import { useAuthStore } from "../../store/authStore"
+import Avatar from "../ui/Avatar"
+import { getPeople } from "../../api/peopleApi"<p>export default function UserList() {</p><p>  const onlineUsers = useChatStore((s) => s.onlineUsers) || []
+  const setSelectedUser = useChatStore((s) => s.setSelectedUser)
+  const selectedUser = useChatStore((s) => s.selectedUser)</p><p>  const currentUser = useAuthStore((s) => s.user)</p><p>  const [allUsers, setAllUsers] = useState([])
+  const [search, setSearch] = useState("")
+  const [loading, setLoading] = useState(true)</p><p>  useEffect(() => {</p><p>    const loadUsers = async () => {
+      try {
+        const users = await getPeople()</p><p>        // remove current user from list
+        const filtered = users.filter(u => u._id !== currentUser?._id)</p><p>        setAllUsers(filtered)</p><p>      } catch (error) {
+        console.error("Failed to load users:", error)
+      } finally {
+        setLoading(false)
+      }
+    }</p><p>    loadUsers()</p><p>  }, [currentUser])</p><p>  const searchTerm = search.toLowerCase()</p><p>  const filteredUsers = useMemo(() => {</p><p>    return allUsers.filter((user) => {</p><p>      const name =
+        <code>${user.firstName || ""} ${user.lastName || ""}</code>.toLowerCase()</p><p>      return name.includes(searchTerm)</p><p>    })</p><p>  }, [allUsers, searchTerm])</p><p>  const noResults = !loading && filteredUsers.length === 0</p><p>  return (</p>    <div className="flex flex-col h-full bg-slate-900/50 backdrop-blur-sm">
+\n... [component continues] ...
+</code></pre><strong>VirtualizedMessageList.jsx</strong><pre><code class="language-jsx">
+import { memo, useEffect, useRef } from "react"
+import Message from "./Message"<p>const VirtualizedMessageList = memo(({ messages = [], onReaction, user }) => {</p><p>    const bottomRef = useRef(null)</p>    /<em> Auto scroll to latest message </em>/<p>    useEffect(() => {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" })
+    }, [messages.length])</p>    if (!messages.length) {
+        return (
+            <div className="flex flex-1 items-center justify-center text-gray-400 text-sm">
+                No messages yet
+            </div>
+        )
+    }<p>    return (</p>        <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-slate-800"><p>            {messages.map((message, index) => {</p><p>                const senderId =
+                    message?.senderId || message?.sender?._id</p><p>                const isOwn = senderId === user?._id</p>                return (
+                    <Message
+                        key={message._id || index}
+                        message={message}
+                        isOwn={isOwn}
+                        onReaction={onReaction}
+                        user={user}
+                    />
+                )
+            })}            <div ref={bottomRef} />        </div>
+    )<p>})</p><p>VirtualizedMessageList.displayName = "VirtualizedMessageList"</p>export default VirtualizedMessageList\n... [component continues] ...
+</code></pre>
+<h3>API Layer</h3><p>#### api.js</p><pre><code class="language-javascript">
+import { API_BASE_URL } from "../constants";<p>const API_URL = <code>${API_BASE_URL}/api</code>;</p><p>export const registerUser = async(data) => {</p><p>    const res = await fetch(<code>${API_URL}/auth/register</code>, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    });</p><p>    return res.json();</p><p>};</p><p>export const loginUser = async(data) => {</p><p>    const res = await fetch(<code>${API_URL}/auth/login</code>, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        credentials: "include",
+        body: JSON.stringify(data)
+    });</p><p>    return res.json();</p><p>};
+export const getUnreadCounts = async() => {</p><p>    const res = await fetch(<code>${API_URL}/messages/unread/counts</code>, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        credentials: "include"
+    });</p><p>    return res.json();</p><p>};
+export const uploadImage = async(file) => {</p><p>    try {</p><p>        const formData = new FormData()
+        formData.append("file", file)</p><p>        const res = await fetch(<code>${API_URL}/upload/image</code>, {
+            method: "POST",
+            body: formData
+        })</p><p>        if (!res.ok) {
+            throw new Error("Upload failed")
+        }</p><p>        return await res.json()</p><p>    } catch (err) {
+        console.error("Upload error:", err)
+    }</p>};</code></pre><p>#### authApi.js</p><pre><code class="language-javascript">
+import api from "./axios";/<em> --------- Generic request handler --------- </em>/<p>const handleRequest = async(request) => {
+    try {
+        const res = await request();
+        return res.data;
+    } catch (error) {
+        const message =
+            (error && error.response && error.response.data && error.response.data.message) ||
+            (error && error.message) ||
+            "API request failed";</p><p>        console.error("API Error:", message);
+        throw message;
+    }
+};</p>/<em> ---------------- LOGIN ---------------- </em>/<p>export const loginUser = (data) =>
+    handleRequest(() => api.post("/api/user/login", data));</p>/<em> ---------------- REGISTER ---------------- </em>/<p>export const registerUser = (data) =>
+    handleRequest(() => api.post("/api/user/register", data));</p>/<em> ---------------- PROFILE ---------------- </em>/export const getProfile = () =>
+    handleRequest(() => api.get("/api/user/profile"));</code></pre><p>#### axios.js</p><pre><code class="language-javascript">
+import axios from "axios"
+import { baseUrl } from "../apiConfig"<p>const api = axios.create({
+    baseURL: baseUrl,
+    withCredentials: true
+})</p><p>api.interceptors.request.use((config) => {</p><p>    const token = localStorage.getItem("token")</p><p>    if (token) {
+        config.headers.Authorization = <code>Bearer ${token}</code>
+    }</p><p>    return config</p><p>})</p>export default api</code></pre><p>#### groupApi.js</p><pre><code class="language-javascript">
+import api from "./axios";/<em> ---------------- GET GROUPS ---------------- </em>/<p>export const getGroups = async() => {
+    try {</p><p>        const res = await api.get("/api/group");
+        return res.data;</p><p>    } catch (error) {</p><p>        let message = "Failed to fetch groups";</p><p>        if (error && error.response && error.response.data) {</p><p>            const data = error.response.data;</p><p>            if (typeof data === "object" && data.message) {
+                message = data.message;
+            } else if (typeof data === "string") {
+                message = data;
+            }</p><p>        } else if (error && error.message) {</p><p>            message = error.message;
+        }</p><p>        console.error("Failed to fetch groups:", message);</p><p>        throw new Error(message);
+    }
+};</p>
+/<em> ---------------- CREATE GROUP ---------------- </em>/<p>export const createGroup = async(data) => {
+    try {</p><p>        const res = await api.post("/api/group", data);
+        return res.data;</p><p>    } catch (error) {</p><p>        let message = "Failed to create group";</p><p>        if (error && error.response && error.response.data) {</p><p>            const data = error.response.data;</p><p>            if (typeof data === "object" && data.message) {
+                message = data.message;
+            } else if (typeof data === "string") {
+                message = data;
+            }</p><p>        } else if (error && error.message) {</p><p>            message = error.message;
+        }</p><p>        console.error("Failed to create group:", message);</p>        throw new Error(message);
+    }
+};</code></pre><p>#### messageApi.js</p><pre><code class="language-javascript">
+import api from "./axios";/<em> ---------------- GET MESSAGES ---------------- </em>/<p>export const getMessages = async(userId) => {</p><p>    if (!userId) {
+        throw new Error("User ID is required to fetch messages");
+    }</p><p>    try {</p><p>        const res = await api.get(<code>/api/user/messages/${userId}</code>);</p><p>        return res.data;</p><p>    } catch (error) {</p><p>        let message = "Failed to fetch messages";</p><p>        if (error && error.response && error.response.data) {</p><p>            const data = error.response.data;</p><p>            if (typeof data === "object" && data.message) {
+                message = data.message;
+            } else if (typeof data === "string") {
+                message = data;
+            }</p><p>        } else if (error && error.message) {</p><p>            message = error.message;
+        }</p><p>        console.error("Failed to fetch messages:", message);</p>        throw new Error(message);
+    }
+};</code></pre><p>#### peopleApi.js</p><pre><code class="language-javascript">
+import api from "./axios";/<em> ---------------- GET PEOPLE ---------------- </em>/export const getPeople = async() => {
+    try {
+        const res = await api.get("/api/user/people");
+        return res.data;
+    } catch (error) {
+        let message = "Failed to fetch people";
+        if (error && error.response && error.response.data) {
+            const data = error.response.data;
+            if (typeof data === "object" && data.message) {
+                message = data.message;
+            } else if (typeof data === "string") {
+                message = data;
+            }
+        } else if (error && error.message) {
+            message = error.message;
+        }
+        console.error("Failed to fetch people:", message);
+        throw new Error(message);
+    }
+};</code></pre><p>#### reactionApi.js</p><pre><code class="language-javascript">
+import api from "./axios";/<em> ---------------- ADD REACTION ---------------- </em>/<p>export const addReaction = async(messageId, emoji) => {</p><p>    if (!messageId || !emoji) {
+        throw new Error("Message ID and emoji are required");
+    }</p><p>    try {</p><p>        const res = await api.post("/api/user/reaction", {
+            messageId,
+            emoji
+        });</p><p>        return res.data;</p><p>    } catch (error) {</p><p>        let message = "Failed to add reaction";</p><p>        if (error && error.response && error.response.data) {</p><p>            const data = error.response.data;</p><p>            if (typeof data === "object" && data.message) {
+                message = data.message;
+            } else if (typeof data === "string") {
+                message = data;
+            }</p><p>        } else if (error && error.message) {</p><p>            message = error.message;
+        }</p><p>        console.error("Failed to add reaction:", message);</p>        throw new Error(message);
+    }
+};</code></pre>
+<h2>Environment Configuration</h2><h3>.env File (Development Template)\n</h3>
+<pre><code class="language-bash">
+</code></pre><h2>Setup & Deployment</h2><h3>Prerequisites\n</h3><p>- Node.js >= 14.0.0
+- npm >= 6.0.0
+- MongoDB instance or MongoDB Atlas account
+- Redis server
+- SMTP credentials (optional, for email features)</p><h3>Installation</h3>\<code>\</code>\`bash
+<h1>Install dependencies</h1>
+npm install<h1>Install server dependencies</h1>
+cd server && npm install && cd ..<h1>Install frontend dependencies</h1>
+cd frontend && npm install && cd ..
+\<code>\</code>\<code><h3>Development Setup</h3><p>\</code>\<code>\</code>bash
+npm run dev
+\<code>\</code>\<code></p><h3>Building for Production</h3>\</code>\<code>\</code>bash
+<h1>Build frontend</h1>
+cd frontend && npm run build<h1>Build server (if applicable)</h1>
+cd server && npm run build
+\<code>\</code>\<code><h3>Environment Variables Required</h3><p>- </code>NODE_ENV`: Development or production
+- <code>PORT</code>: Server port (default: 4000)
+- <code>DB</code>: MongoDB connection string
+- <code>JWTPRIVATEKEY</code>: JWT secret key
+- <code>REDIS_URL</code>: Redis connection URL
+- <code>BASE_URL</code>: Frontend base URL
+- SMTP credentials for email service</p><h3>Deployment Options</h3>1. <strong>Netlify</strong> (Frontend only)
+2. <strong>Railway</strong> (Full-stack)
+3. <strong>Heroku</strong> (Legacy, using Procfile)
+4. <strong>Custom VPS</strong> (Docker supported)
+  
+  <hr style="margin-top: 50px;">
+  <p style="text-align: center; color: #999; font-size: 0.9em; margin-top: 30px;">
+    Chat App V1.2 © 2026 - Full Stack Chat Application
+  </p>
+</body>
+</html>
