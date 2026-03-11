@@ -44,17 +44,10 @@ const formatTime = (value) => {
   }
 };
 
-function EmptyChatState({ title = "You’ve not chat yet !!" }) {
+function EmptyChatState({ title = "You've not chat yet !!" }) {
   return (
-    <div className="h-full flex flex-col items-center justify-center text-center px-6">
-      <div className="relative mb-4">
-        <div className="w-36 h-36 rounded-full bg-gradient-to-br from-indigo-100 to-violet-100 animate-pulse" />
-        <div className="absolute inset-0 m-auto w-20 h-20 rounded-2xl bg-white shadow flex items-center justify-center">
-          <Send className="text-indigo-500" size={26} />
-        </div>
-      </div>
-      <h2 className="text-xl font-semibold text-slate-700">{title}</h2>
-      <p className="text-sm text-slate-500 mt-2">There is no chat done yet. Click on a user to start chat.</p>
+    <div className="h-full flex items-center justify-center text-center px-6">
+      <p className="text-sm text-slate-400">{title}</p>
     </div>
   );
 }
@@ -174,7 +167,7 @@ export default function ChatArea({ selectedUser, messages = [], onSendMessage, l
   const closeModal = () => setActiveModal(null);
 
   return (
-    <main className="flex-1 flex bg-slate-100 overflow-hidden">
+    <main className="flex-1 flex bg-[#eef1f7] overflow-hidden">
       <section className="flex-1 flex flex-col min-w-0">
         <header className="h-20 px-6 bg-white border-b border-slate-200 flex items-center justify-between">
           {showGroup ? (
@@ -218,7 +211,7 @@ export default function ChatArea({ selectedUser, messages = [], onSendMessage, l
         </header>
 
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4 bg-[linear-gradient(180deg,#f8fafc_0%,#f1f5f9_100%)]">
-          {!showDirect && !showGroup && <EmptyChatState />}
+          {!showDirect && !showGroup && <div className="h-full" />}
 
           {showGroup && <EmptyChatState title="Group conversation is empty" />}
 

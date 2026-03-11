@@ -47,7 +47,7 @@ export default function Conversations({ onToggle, users = [], selectedUserId, on
   }, [users, search]);
 
   return (
-    <section className="w-[390px] bg-white border-r border-slate-200 flex flex-col">
+    <section className="w-[392px] bg-white border-r border-slate-200 flex flex-col">
       <div className="p-5 border-b border-slate-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -80,7 +80,7 @@ export default function Conversations({ onToggle, users = [], selectedUserId, on
 
       <div className="px-5 py-3 border-b border-slate-100">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-semibold text-slate-800">Message ({filteredUsers.length})</h3>
+          <h3 className="font-semibold text-slate-800">Message ({mode === "chat" ? filteredUsers.length : 0})</h3>
           <div className="flex gap-2">
             <button className="p-2 rounded-xl bg-slate-100 text-slate-500 hover:bg-slate-200"><Search size={16} /></button>
             <button className="p-2 rounded-xl bg-indigo-500 text-white hover:bg-indigo-600"><Plus size={16} /></button>
