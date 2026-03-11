@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import LoadingPage from "../components/LoadingPage";
-import { useGlobalLoading } from "../App";
+import { useGlobalLoading } from "../context/GlobalLoadingContext";
 import { loadingConfigs } from "../hooks/useLoading";
 
 const LoadingDemo = () => {

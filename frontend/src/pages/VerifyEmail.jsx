@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api/axios";
 import { Link, useParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
@@ -20,7 +20,7 @@ const VerifyEmail = () => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get(`/api/user/${id}/verify/${token}`);
+                const response = await api.get(`/api/auth/${id}/verify/${token}`);
                 toast.success(response.data.message);
                 // console.log("Verification successful:", response.data);
             } catch (error) {

@@ -13,7 +13,7 @@ export const ProfileProvider = ({ children }) => {
         const fetchUserDetails = async () => {
             try {
                 const response = await axios.get(
-                    "/api/user/profile"
+                    "/api/profile/me"
                 );
                 // console.log(response.data);
                 setUserDetails(response.data);

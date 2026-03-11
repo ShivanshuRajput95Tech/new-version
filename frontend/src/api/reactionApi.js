@@ -10,7 +10,7 @@ export const addReaction = async(messageId, emoji) => {
 
     try {
 
-        const res = await api.post("/api/user/reaction", {
+        const res = await api.post("/api/messages/reaction", {
             messageId,
             emoji
         });
