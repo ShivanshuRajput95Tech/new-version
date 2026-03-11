@@ -1,54 +1,63 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { MessageSquare, Settings, LogOut, Plus, Bell, Moon, Users, Phone } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-import Settings from "../Settings";
+
+const railItems = [
+  { id: "messages", icon: MessageSquare },
+  { id: "contacts", icon: Users },
+  { id: "calls", icon: Phone },
+  { id: "alerts", icon: Bell },
+  { id: "theme", icon: Moon },
+];
 
 export default function Sidebar({ onClose }) {
   const { logout } = useAuth();
   const navigate = useNavigate();
-  const [showSettings, setShowSettings] = useState(false);
+  const [activeItem, setActiveItem] = useState("messages");
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate("/login");
   };
 
   return (
-    <>
-      <div className="w-20 bg-zinc-800 flex flex-col items-center py-5 gap-6 relative">
+    <aside className="w-24 bg-white border-r border-slate-200 flex flex-col items-center py-6 gap-4 shadow-[0_0_30px_rgba(15,23,42,0.06)] relative">
+      <button onClick={onClose} className="md:hidden absolute top-2 right-2 text-slate-500 hover:bg-slate-100 p-1 rounded-lg">✕</button>
+
+      <div className="w-12 h-12 rounded-2xl bg-indigo-600 text-white font-bold flex items-center justify-center shadow-lg">C</div>
+
+      {railItems.map(({ id, icon: Icon }) => (
         <button
-          onClick={onClose}
-          className="md:hidden absolute top-2 right-2 text-white hover:bg-zinc-700 p-1 rounded transition-colors duration-200"
+          key={id}
+          onClick={() => setActiveItem(id)}
+          className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-200 ${
+            activeItem === id
+              ? "bg-indigo-500 text-white shadow-md shadow-indigo-200"
+              : "text-slate-500 hover:bg-slate-100"
+          }`}
         >
-          ✕
+          <Icon size={18} />
         </button>
-        <div className="relative group">
-          <img
-            src="https://i.imgur.com/qGsYvAK.png"
-            className="w-12 h-12 rounded-full transition-transform duration-300 hover:scale-110"
-            alt="Profile"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-        </div>
-        <button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 w-10 h-10 rounded-xl text-lg transition-all duration-300 transform hover:scale-110 active:scale-95 shadow-lg">
-          +
+      ))}
+
+      <button className="w-11 h-11 rounded-2xl flex items-center justify-center text-slate-500 hover:bg-slate-100">
+        <Plus size={18} />
+      </button>
+
+      <div className="mt-auto flex flex-col gap-3">
+        <button className="w-11 h-11 rounded-2xl flex items-center justify-center text-slate-500 hover:bg-slate-100">
+          <Settings size={18} />
         </button>
-        <button
-          onClick={() => setShowSettings(true)}
-          className="bg-gradient-to-r from-zinc-600 to-zinc-500 hover:from-zinc-500 hover:to-zinc-400 w-10 h-10 rounded-xl text-lg transition-all duration-300 transform hover:scale-110 active:scale-95 shadow-lg"
-          title="Settings"
-        >
-          ⚙️
-        </button>
+
         <button
           onClick={handleLogout}
-          className="bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 w-10 h-10 rounded-xl text-lg transition-all duration-300 transform hover:scale-110 active:scale-95 shadow-lg"
+          className="w-11 h-11 rounded-2xl flex items-center justify-center text-rose-500 hover:bg-rose-50"
           title="Logout"
         >
-          ↩
+          <LogOut size={18} />
         </button>
       </div>
-      {showSettings && <Settings onClose={() => setShowSettings(false)} />}
-    </>
+    </aside>
   );
 }

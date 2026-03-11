@@ -27,6 +27,7 @@ const Developer = lazy(() => import("./pages/Developer"));
 const Design = lazy(() => import("./pages/Design"));
 const TestChat = lazy(() => import("./pages/TestChat"));
 const LoadingDemo = lazy(() => import("./pages/LoadingDemo"));
+const Chat = lazy(() => import("./pages/Chat"));
 
 // Loading Context
 const LoadingContext = createContext();
@@ -96,6 +97,10 @@ const router = createBrowserRouter([
             {
                 path: "loading-demo",
                 element: <LoadingDemo />,
+            },
+            {
+                path: "chat",
+                element: <Chat />,
             },
         ],
     },

@@ -32,7 +32,7 @@ export const useAuthStore = create((set) => ({
 
             const res = await loginUser(data)
 
-            const { user, token } = res.data
+            const { user, token } = res
 
             localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user))
             localStorage.setItem(STORAGE_KEYS.TOKEN, token)
@@ -100,7 +100,7 @@ export const useAuthStore = create((set) => ({
 
             const res = await getProfile()
 
-            const user = res.data
+            const user = res
 
             localStorage.setItem(
                 STORAGE_KEYS.USER,
