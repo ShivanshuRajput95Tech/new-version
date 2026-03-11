@@ -10,9 +10,12 @@ import {
   CheckCircle2,
   Monitor,
   Server,
-  Link,
+  Link2,
   Route,
+  Copy,
+  ExternalLink,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { fetchPlatformProject, fetchPlatformReview } from "../api/platformApi";
 
 const fallbackReview = {
@@ -45,6 +48,9 @@ const coreFeatures = [
 export default function Developer() {
   const [review, setReview] = useState(fallbackReview);
   const [project, setProject] = useState(fallbackProject);
+  const [copied, setCopied] = useState(false);
+
+  const testChatUrl = typeof window !== "undefined" ? `${window.location.origin}/chat` : "/chat";
 
   useEffect(() => {
     const run = async () => {
@@ -63,6 +69,16 @@ export default function Developer() {
     run();
   }, []);
 
+  const copyTestLink = async () => {
+    try {
+      await navigator.clipboard.writeText(testChatUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      setCopied(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
       <div className="max-w-6xl mx-auto px-6 py-12 space-y-8">
@@ -71,10 +87,27 @@ export default function Developer() {
           <h1 className="text-4xl font-black mt-2">{review.product}</h1>
           <p className="text-slate-300 mt-4">{review.positioning}</p>
           <div className="mt-5 inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-slate-900 border border-white/10 text-xs">
-            <Link size={14} className="text-emerald-400" />
+            <Link2 size={14} className="text-emerald-400" />
             Project connection status:
             <span className={`font-semibold ${project.status === "active" ? "text-emerald-400" : "text-amber-400"}`}>{project.status}</span>
           </div>
+        </section>
+
+        <section className="rounded-2xl border border-white/10 bg-white/5 p-6">
+          <h2 className="text-xl font-bold flex items-center gap-2"><ExternalLink size={18} /> Developer Test Links</h2>
+          <p className="text-sm text-slate-400 mt-2">Use these links to preview chat window UI and interface flows quickly.</p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link to="/chat" className="px-4 py-2 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-sm font-semibold">
+              Open Chat Window (/chat)
+            </Link>
+            <Link to="/test" className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-white/10 text-sm font-semibold">
+              Open Test Chat (/test)
+            </Link>
+            <button onClick={copyTestLink} className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-sm font-semibold inline-flex items-center gap-2">
+              <Copy size={14} /> {copied ? "Copied" : "Copy Test Chat Link"}
+            </button>
+          </div>
+          <p className="mt-3 text-xs text-indigo-300 break-all">Shareable test link: {testChatUrl}</p>
         </section>
 
         <section className="rounded-2xl border border-white/10 bg-white/5 p-6">
