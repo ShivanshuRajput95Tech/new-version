@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../api/axios";
 import { toast } from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, User, ArrowRight } from "lucide-react";
@@ -23,7 +23,7 @@ const Register = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post("/api/auth/register", data);
+      const response = await api.post("/api/auth/register", data);
       toast.success(response.data?.message || "Registration successful");
       navigate("/login");
     } catch (error) {

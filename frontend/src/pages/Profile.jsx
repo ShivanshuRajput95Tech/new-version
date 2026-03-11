@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api/axios";
 import { motion } from "framer-motion";
 import Nav from "../components/chat/Nav";
 import { useAuth } from "../context/AuthContext";
@@ -22,14 +22,14 @@ const Profile = () => {
     globalLoading.startLoading("Updating your profile...", "pulse");
 
     try {
-      const response = await axios.put("/api/profile/update", {
+      const response = await api.put("/api/profile/update", {
         ...formData,
         avatarLink: selectedLink,
       });
       console.log(response.data);
       // Also update status
       if (formData.status) {
-        await axios.put("/api/profile/status", { status: formData.status });
+        await api.put("/api/profile/status", { status: formData.status });
       }
       globalLoading.stopLoading();
     } catch (error) {

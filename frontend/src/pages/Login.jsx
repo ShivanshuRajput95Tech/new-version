@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api/axios";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { Mail, Lock, ArrowRight } from "lucide-react";
@@ -27,7 +27,7 @@ const Login = () => {
     globalLoading.startLoading("Signing you in...", "pulse");
 
     try {
-      const response = await axios.post("/api/auth/login", data, { withCredentials: true });
+      const response = await api.post("/api/auth/login", data);
       if (response.status === 200) {
         setAuthenticated(true);
         toast.success(response.data.message || "Login successful");
